@@ -1,26 +1,32 @@
-#pragma once
-
 #ifndef H_PLATFORM
 #define H_PLATFORM
 
 class Platform
 {
 public:
-	int getLenght() const { return lenght; };
-	void setLenght(int x);
-	int getyCoordinate() const { return yCoordinate; };
-	void setyCoordinate(int x);
+	int getlength() const { return length; };
+	void setlength(int x);
+	int getxCoordinate() const { return xCoordinate; };
+	void setxCoordinate(int x);
 protected:
-	int lenght;
-	int yCoordinate;
+	int length;
+	int xCoordinate;
 };
 
 class PlatformPlayer : public Platform
 {
 public:
-	PlatformPlayer(int Lenght, int yCoordinate);
+	PlatformPlayer(int length, int yCoordinate);
 	void MoveUp();
 	void MoveDown(int xPlayingField);
 };
-
+class PlatformAI : public Platform
+{
+protected:
+	int difficulty;
+public:
+	PlatformAI(int length, int yCoordinate, int difficulty);
+	void SetDifficulty(int difficulty);
+	int Move(int xPlayingField, int yPlayingField, int BallX, int BallY);
+};
 #endif

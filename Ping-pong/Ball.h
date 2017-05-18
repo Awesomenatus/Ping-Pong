@@ -1,7 +1,5 @@
-#pragma once
-
-#ifndef H_PLATFORM
-#define H_PLATFORM
+#ifndef H_BALL
+#define H_BALL
 
 class Ball
 {

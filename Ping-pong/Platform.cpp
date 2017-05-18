@@ -1,25 +1,55 @@
 #include "Platform.h"
 
-void Platform::setLenght(int x)
+void Platform::setlength(int x)
 {
-	this->lenght = x;
+	this->length = x;
 }
-void Platform::setyCoordinate(int x)
+void Platform::setxCoordinate(int x)
 {
-	this->yCoordinate = x;
+	this->xCoordinate = x;
 }
 PlatformPlayer::PlatformPlayer(int x, int y)
 {
-	setLenght(x);
-	setyCoordinate(y);
+	setlength(x);
+	setxCoordinate(y);
 }
 void PlatformPlayer::MoveUp()
 {
-	if (yCoordinate > 0)
-	this->yCoordinate--;
+	if (xCoordinate > 1)
+	this->xCoordinate--;
 }
 void PlatformPlayer::MoveDown(int xPlayingField)
 {
-	if (yCoordinate < xPlayingField-2)
-	this->yCoordinate++;
+	if ((xCoordinate+length) < xPlayingField-1)
+	this->xCoordinate++;
+}
+
+PlatformAI::PlatformAI(int x, int y, int difficulty)
+{
+	setlength(x);
+	setxCoordinate(y);
+	SetDifficulty(difficulty);
+}
+
+void PlatformAI::SetDifficulty(int x)
+{
+	this->difficulty=x;
+}
+int PlatformAI::Move(int xPlayingField, int yPlayingField, int BallX, int BallY)
+{
+	if ((BallY<(yPlayingField/difficulty)))
+	{
+		if (((xCoordinate+length)/2 < BallX)&&
+			((xCoordinate+length) < (xPlayingField-1)))
+		{
+			this->xCoordinate++;
+			return 1;
+		}else if (((xCoordinate+length)/2 > BallX)&&
+			(xCoordinate > 1))
+		{
+			this->xCoordinate--;
+			return -1;
+		}
+	}
+	return 0;
 }

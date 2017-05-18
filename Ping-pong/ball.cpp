@@ -27,7 +27,7 @@ void Ball::move(char **Field)
 	int yPotential = yCoordinate + YMove;
 	if (
 		(Field[xPotential][yPotential] == '|') &&
-		((Field[xPotential + 1][yPotential] == ' ') || (Field[xPotential - 1][yPotential] == ' '))
+		((Field[xPotential -XMove][yPotential] == ' '))
 		)
 	{
 		xChange();
@@ -38,14 +38,14 @@ void Ball::move(char **Field)
 
 	if (Field[xPotential][yPotential] == 'X')
 	{
-		yChange();
-		yPotential = yCoordinate + YMove;
+		xChange();
+		xPotential = xCoordinate + XMove;
 	}
 
 	if (Field[xPotential][yPotential] == '|')
 	{
-		xChange();
-		xPotential = xCoordinate + XMove;
+		yChange();
+		yPotential = yCoordinate + YMove;
 	}
 
 
