@@ -1,7 +1,7 @@
 #include <iostream>
 #include "Platform.h"
 #include "Ball.h"
-#include <ncurses.h>
+#include <ncurses.h> //сторонняя библиотека для работы с консолью
 #include <unistd.h>
 
 using namespace std;
@@ -12,19 +12,19 @@ int main()
 	int xPlayingField, yPlayingField, Platformlength, difficulty;
 	char AI;
 	bool AICheck;
-	printw("Enter the number of rows and columns \n");
+	printw("Enter the number of rows and columns \n"); // ввод размеров поля (я не стал писать конструкции типа throw catch, надеясь на вашу сознательность)
 	scanw("%d", &xPlayingField);
 	scanw("%d", &yPlayingField);
 	char **PlayingField = new char*[xPlayingField];
 	for (int count = 0; count < xPlayingField; count++)
 		PlayingField[count] = new char[yPlayingField];
-	printw("Enter the length of the platform\n");
+	printw("Enter the length of the platform\n"); // ввод длинны платформы
 	scanw("%d", &Platformlength);
 	printw("Second player AI? (y / n)\n");
 	scanw("%c", &AI);
 	if (AI == 'y')
 	{
-		printw("Game difficulty (1-hard,2-normal, 3-easy)\n");
+		printw("Game difficulty (1-hard,2-normal, 3-easy)\n");// сложность
 		scanw("%d", &difficulty);
 		AICheck=TRUE;
 	}
@@ -32,6 +32,7 @@ int main()
 	{
 		AICheck=FALSE;
 	}
+	// **** создание объектов
 	PlatformAI frstAI(Platformlength,
 					((xPlayingField - Platformlength) / 2), difficulty);
 	PlatformPlayer frst(Platformlength,
@@ -40,6 +41,8 @@ int main()
 
 
 	Ball ball(xPlayingField, yPlayingField);
+	//*****
+	// создание стартового состояния
 	for (int x = 0; x < xPlayingField; x++)
 	{
 		for (int y = 0; y < yPlayingField; y++)
@@ -70,13 +73,14 @@ int main()
 			PlayingField[i][2] = '|';
 		};
 
-	PlayingField[ball.getX()][ball.getY()] = 'o';
+	PlayingField[ball.getX()][ball.getY()] = 'o'; 
+	//*****
 	clear();
 	for (int x = 0; x < xPlayingField; x++)
 	{
 		printw("%s \n", PlayingField[x]);
 	}
-	while (true)
+	while (true) // цикл обработки нажатий, и движения мячика
 	{
 		noecho();
 		int n;
