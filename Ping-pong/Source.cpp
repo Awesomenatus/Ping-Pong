@@ -12,7 +12,7 @@ int main()
 	int xPlayingField, yPlayingField, Platformlength, difficulty;
 	char AI;
 	bool AICheck;
-	printw("Enter the number of rows and columns \n"); // ввод размеров поля (я не стал писать конструкции типа throw catch, надеясь на вашу сознательность)
+	printw("Enter the number of rows and columns \n"); // ввод размеров поля (я не стал писать конструкции типа try catch, надеясь на вашу сознательность)
 	scanw("%d", &xPlayingField);
 	scanw("%d", &yPlayingField);
 	char **PlayingField = new char*[xPlayingField];
