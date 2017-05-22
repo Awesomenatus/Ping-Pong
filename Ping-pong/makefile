@@ -1,2 +1,2 @@
 all:
-    g++ -o Source.cpp ball.cpp Platform.cpp Ball.h Platform.h -lncurses
+    g++ -o Ping-Pong Source.cpp ball.cpp Platform.cpp Ball.h Platform.h -lncurses
