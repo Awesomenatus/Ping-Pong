@@ -13,14 +13,14 @@ protected:
 	int xCoordinate;
 };
 
-class PlatformPlayer : public Platform
+class PlatformPlayer : public Platform // Дочерний класс игрока/игроков 
 {
 public:
 	PlatformPlayer(int length, int yCoordinate);
 	void MoveUp();
 	void MoveDown(int xPlayingField);
 };
-class PlatformAI : public Platform
+class PlatformAI : public Platform // Дочерний класс ИИ
 {
 protected:
 	int difficulty;
