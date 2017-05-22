@@ -7,7 +7,7 @@ Ball::Ball(int x, int y)
 	srand(time(0));
 	xCoordinate = x/2;
 	yCoordinate = y/2;
-	(rand() % 10 + 1 < 5) ? XMove = -1 : XMove = 1;
+	(rand() % 10 + 1 < 5) ? XMove = -1 : XMove = 1; // случайное изначальное направление движения
 	(rand() % 10 + 1 < 5) ? YMove = -1 : YMove = 1;
 }
 
