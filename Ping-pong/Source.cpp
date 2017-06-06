@@ -39,8 +39,8 @@ int main()
 						((xPlayingField - Platformlength) / 2));	
 	PlatformPlayer scnd(Platformlength, ((xPlayingField - Platformlength) / 2));
 
-
-	Ball ball(xPlayingField, yPlayingField);
+	
+	Ball ball(xPlayingField/2, yPlayingField/2);
 	//*****
 	// создание стартового состояния
 	for (int x = 0; x < xPlayingField; x++)

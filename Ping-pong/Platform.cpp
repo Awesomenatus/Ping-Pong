@@ -39,12 +39,12 @@ int PlatformAI::Move(int xPlayingField, int yPlayingField, int BallX, int BallY)
 {
 	if ((BallY<(yPlayingField/difficulty)))
 	{
-		if (((xCoordinate+length)/2 < BallX)&&
+		if ((xCoordinate+length/2 < BallX)&&
 			((xCoordinate+length) < (xPlayingField-1)))
 		{
 			this->xCoordinate++;
 			return 1;
-		}else if (((xCoordinate+length)/2 > BallX)&&
+		}else if ((xCoordinate+length/2 > BallX)&&
 			(xCoordinate > 1))
 		{
 			this->xCoordinate--;
