@@ -22,22 +22,22 @@ void Ball::yChange() {
 }
 
 void Ball::move(const std::vector<char>& PlayingField, int yPlayingField) {
-  int Potential = (xCoordinate + XMove)* yPlayingField + (yCoordinate + YMove);
+  int Potential = (xCoordinate + XMove) * yPlayingField + (yCoordinate + YMove);
   if ((PlayingField[Potential] == '|') &&
-      ((PlayingField[Potential - XMove*yPlayingField] == ' '))) {
+      ((PlayingField[Potential - XMove * yPlayingField] == ' '))) {
     xChange();
     yChange();
-  	Potential = (xCoordinate + XMove)*(yCoordinate + YMove);
+    Potential = (xCoordinate + XMove) * (yCoordinate + YMove);
   }
 
   if (PlayingField[Potential] == 'X') {
     xChange();
-    Potential = (xCoordinate + XMove)*(yCoordinate + YMove);
+    Potential = (xCoordinate + XMove) * (yCoordinate + YMove);
   }
 
   if (PlayingField[Potential] == '|') {
     yChange();
-    Potential = (xCoordinate + XMove)*(yCoordinate + YMove);
+    Potential = (xCoordinate + XMove) * (yCoordinate + YMove);
   }
 
   xCoordinate += XMove;
