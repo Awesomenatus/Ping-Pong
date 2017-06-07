@@ -19,10 +19,7 @@ int main() {
   // сознательность)
   scanw("%d", &xPlayingField);
   scanw("%d", &yPlayingField);
-  vector<vector<char> > PlayingField(xPlayingField);
-  for (int row = 0; row < xPlayingField; ++row) {
-    PlayingField[row].resize(yPlayingField);
-  }
+  vector<char> PlayingField;
   printw("Enter the length of the platform\n");  // ввод длинны платформы
   scanw("%d", &Platformlength);
   printw("Second player AI? (y / n)\n");
@@ -35,9 +32,6 @@ int main() {
     AICheck = FALSE;
   }
   // **** создание объектов
-  for (int countX = 0; countX < xPlayingField; countX++) {
-    PlayingField[countX].push_back('\0');
-  }
   PlatformAI frstAI(Platformlength, ((xPlayingField - Platformlength) / 2),
                     difficulty);
   PlatformPlayer frst(Platformlength, ((xPlayingField - Platformlength) / 2));
@@ -46,35 +40,36 @@ int main() {
   Ball ball(xPlayingField / 2, yPlayingField / 2);
   //*****
   // создание стартового состояния
-  for (int x = 0; x < xPlayingField; x++) {
-    for (int y = 0; y < yPlayingField; y++) {
-      PlayingField[x][y] = ' ';
-    };
+  for (int x = 0; x < xPlayingField*yPlayingField-1; x++) {
+    PlayingField.push_back(' ');
   };
   for (int count = 0; count < xPlayingField; count++) {
-    PlayingField[count][0] = 'X';
-    PlayingField[count][yPlayingField - 1] = 'X';
+    PlayingField[0+count*yPlayingField] = 'X';
+	PlayingField[yPlayingField-1+count*yPlayingField] = 'X';
   };
   for (int count = 0; count < yPlayingField; count++) {
-    PlayingField[0][count] = 'X';
-    PlayingField[xPlayingField - 1][count] = 'X';
+    PlayingField[0+count] = 'X';
+    PlayingField[0+(xPlayingField-1)*yPlayingField+count] = 'X';
   };
   for (int i = scnd.getxCoordinate();
        i != (scnd.getxCoordinate() + scnd.getlength()); i++) {
-    PlayingField[i][yPlayingField - 3] = '|';
+    PlayingField[yPlayingField - 3 + i*yPlayingField] = '|';
   };
   for (int i = frstAI.getxCoordinate();
        i != (frstAI.getxCoordinate() + frstAI.getlength()); i++) {
-    PlayingField[i][2] = '|';
+    PlayingField[2+i*yPlayingField] = '|';
   };
   for (int i = frst.getxCoordinate();
        i != (frst.getxCoordinate() + frst.getlength()); i++) {
-    PlayingField[i][2] = '|';
+    PlayingField[2+i*yPlayingField] = '|';
   };
 
-  PlayingField[ball.getX()][ball.getY()] = 'o';
-  for (int x = 0; x < xPlayingField; x++) {
-    printw("%s \n", PlayingField[x].data());
+  PlayingField[ball.getX()*yPlayingField+ball.getY()] = 'o';
+  for (int x = 0; x < xPlayingField*yPlayingField; x++) {
+	if (((x%(yPlayingField))==0) && (x!=0)) {
+	  addch('\n');
+	}
+    addch(PlayingField[x]);
   }
   //*****
   clear();
@@ -89,67 +84,69 @@ int main() {
     n = getch();
     switch (n) {
       case KEY_UP:
-        PlayingField[scnd.getxCoordinate() + scnd.getlength() - 1]
-                    [yPlayingField - 3] = ' ';
+        PlayingField[yPlayingField - 3 + ((scnd.getxCoordinate()+scnd.getlength()-1)*yPlayingField)] = ' ';
         scnd.MoveUp();
         break;
       case KEY_DOWN:
-        PlayingField[scnd.getxCoordinate()][yPlayingField - 3] = ' ';
+        PlayingField[scnd.getxCoordinate()*yPlayingField + yPlayingField - 3] = ' ';
         scnd.MoveDown(xPlayingField);
         break;
     }
     if (!AICheck) {
       switch (n) {
         case 'w':
-          PlayingField[frst.getxCoordinate() + frst.getlength() - 1][2] = ' ';
+          PlayingField[(frst.getxCoordinate() + frst.getlength()-1) * yPlayingField + 2] = ' ';
           frst.MoveUp();
           break;
         case 's':
-          PlayingField[frst.getxCoordinate()][2] = ' ';
+          PlayingField[frst.getxCoordinate() * yPlayingField + 2] = ' ';
           frst.MoveDown(xPlayingField);
           break;
       }
     } else {
       int tmp =
           frstAI.Move(xPlayingField, yPlayingField, ball.getX(), ball.getY());
-      if (tmp == 1)
-        PlayingField[frstAI.getxCoordinate() - 1][2] = ' ';
-      else if (tmp == -1)
-        PlayingField[frstAI.getxCoordinate() + frstAI.getlength()][2] = ' ';
+      if (tmp == 1) 
+		PlayingField[(frstAI.getxCoordinate()-1) * yPlayingField + 2] = ' ';
+      else if (tmp == -1) 
+		PlayingField[(frstAI.getxCoordinate() + frstAI.getlength()) * yPlayingField + 2] = ' ';
     }
     if (n == 27)
       break;
     nodelay(stdscr, FALSE);
-    PlayingField[ball.getX()][ball.getY()] = ' ';
-    ball.move(PlayingField);
+    PlayingField[ball.getX() * yPlayingField + ball.getY()] = ' ';
+    ball.move(PlayingField, yPlayingField);
     if (ball.getY() == 1) {
-      printw("The player on the right won");
+      printw("\nThe player on the right won");
       break;
     }
     if (ball.getY() == yPlayingField - 2) {
-      printw("The player on the left won");
+      printw("\nThe player on the left won");
       break;
     }
     if (AICheck) {
-      for (int i = frstAI.getxCoordinate();
-           i != (frstAI.getxCoordinate() + frstAI.getlength()); i++) {
-        PlayingField[i][2] = '|';
-      };
-    } else {
-      for (int i = frst.getxCoordinate();
-           i != (frst.getxCoordinate() + frst.getlength()); i++) {
-        PlayingField[i][2] = '|';
-      };
-    }
-    for (int i = scnd.getxCoordinate();
-         i != (scnd.getxCoordinate() + scnd.getlength()); i++) {
-      PlayingField[i][yPlayingField - 3] = '|';
-    };
-    PlayingField[ball.getX()][ball.getY()] = 'o';
+	  for (int i = frstAI.getxCoordinate();
+		   i != (frstAI.getxCoordinate() + frstAI.getlength()); i++) {
+		PlayingField[2+i*yPlayingField] = '|';
+	  }}
+		else {
+		  for (int i = frst.getxCoordinate();
+		       i != (frst.getxCoordinate() + frst.getlength()); i++) {
+	        PlayingField[2+i*yPlayingField] = '|';
+  		  }	
+		}
+	for (int i = scnd.getxCoordinate();
+    	  i != (scnd.getxCoordinate() + scnd.getlength()); i++) {
+	  PlayingField[yPlayingField - 3 + i*yPlayingField] = '|';
+	};
+    PlayingField[ball.getX() * yPlayingField + ball.getY()] = 'o';
     clear();
-    for (int x = 0; x < xPlayingField; x++) {
-      printw("%s \n", PlayingField[x].data());
-    }
+    for (int x = 0; x < xPlayingField*yPlayingField; x++) {
+	  if (((x%(yPlayingField))==0) && (x!=0)) {
+	  addch('\n');
+	  }
+    addch(PlayingField[x]);
+  }
     refresh();
   }
   refresh();
