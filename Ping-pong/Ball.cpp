@@ -1,6 +1,7 @@
 #include "Ball.h"
 #include <stdlib.h>
 #include <time.h>
+#include <vector>
 
 Ball::Ball(int x, int y) {
   srand(time(0));
@@ -20,23 +21,23 @@ void Ball::yChange() {
   YMove = -YMove;
 }
 
-void Ball::move(char** Field) {
+void Ball::move(const std::vector<std::vector<char> >& PlayingField) {
   int xPotential = xCoordinate + XMove;
   int yPotential = yCoordinate + YMove;
-  if ((Field[xPotential][yPotential] == '|') &&
-      ((Field[xPotential - XMove][yPotential] == ' '))) {
+  if ((PlayingField[xPotential][yPotential] == '|') &&
+      ((PlayingField[xPotential - XMove][yPotential] == ' '))) {
     xChange();
     yChange();
     xPotential = xCoordinate + XMove;
     yPotential = yCoordinate + YMove;
   }
 
-  if (Field[xPotential][yPotential] == 'X') {
+  if (PlayingField[xPotential][yPotential] == 'X') {
     xChange();
     xPotential = xCoordinate + XMove;
   }
 
-  if (Field[xPotential][yPotential] == '|') {
+  if (PlayingField[xPotential][yPotential] == '|') {
     yChange();
     yPotential = yCoordinate + YMove;
   }

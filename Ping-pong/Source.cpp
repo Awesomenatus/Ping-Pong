@@ -3,6 +3,7 @@
 #include "Ball.h"
 #include <ncurses.h>  //сторонняя библиотека для работы с консолью
 #include <unistd.h>
+#include <vector>
 
 using namespace std;
 int main() {
@@ -12,15 +13,16 @@ int main() {
   char AI;
   bool AICheck;
   printw("Enter the number of rows and columns \n");  // ввод размеров поля (я
-                                                      // не стал писать
-                                                      // конструкции типа try
-                                                      // catch, надеясь на вашу
-                                                      // сознательность)
+  // не стал писать
+  // конструкции типа try
+  // catch, надеясь на вашу
+  // сознательность)
   scanw("%d", &xPlayingField);
   scanw("%d", &yPlayingField);
-  char** PlayingField = new char*[xPlayingField];
-  for (int count = 0; count < xPlayingField; count++)
-    PlayingField[count] = new char[yPlayingField];
+  vector<vector<char> > PlayingField(xPlayingField);
+  for (int row = 0; row < xPlayingField; ++row) {
+    PlayingField[row].resize(yPlayingField);
+  }
   printw("Enter the length of the platform\n");  // ввод длинны платформы
   scanw("%d", &Platformlength);
   printw("Second player AI? (y / n)\n");
@@ -33,6 +35,9 @@ int main() {
     AICheck = FALSE;
   }
   // **** создание объектов
+  for (int countX = 0; countX < xPlayingField; countX++) {
+    PlayingField[countX].push_back('\0');
+  }
   PlatformAI frstAI(Platformlength, ((xPlayingField - Platformlength) / 2),
                     difficulty);
   PlatformPlayer frst(Platformlength, ((xPlayingField - Platformlength) / 2));
@@ -68,12 +73,12 @@ int main() {
   };
 
   PlayingField[ball.getX()][ball.getY()] = 'o';
+  for (int x = 0; x < xPlayingField; x++) {
+    printw("%s \n", PlayingField[x].data());
+  }
   //*****
   clear();
-  for (int x = 0; x < xPlayingField; x++) {
-    printw("%s \n", PlayingField[x]);
-  }
-  while (true)  // цикл обработки нажатий, и движения мячика
+  while (true)  // цикл обработки нажатий и движения мячика
   {
     noecho();
     int n;
@@ -143,7 +148,7 @@ int main() {
     PlayingField[ball.getX()][ball.getY()] = 'o';
     clear();
     for (int x = 0; x < xPlayingField; x++) {
-      printw("%s \n", PlayingField[x]);
+      printw("%s \n", PlayingField[x].data());
     }
     refresh();
   }

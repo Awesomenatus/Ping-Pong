@@ -1,5 +1,6 @@
 #ifndef H_BALL
 #define H_BALL
+#include <vector>
 
 class Ball {
  protected:
@@ -12,7 +13,7 @@ class Ball {
   Ball(int x, int y);
   void xChange();
   void yChange();
-  void move(char** Field);
+  void move(const std::vector<std::vector<char> >& PlayingField);
   int getX() const { return xCoordinate; };
   int getY() const { return yCoordinate; };
 };
