@@ -8,7 +8,7 @@ include_directories(${GTEST_INCLUDE_DIRS})
 
 add_library(Ball STATIC Ball.cpp)
 
-set(SOURCE_EXE Source.cpp Platform.cpp)
+set(SOURCE_EXE Source.cpp Platform.cpp draw.cpp fill_vector.cpp)
 
 find_package(Curses REQUIRED)
 

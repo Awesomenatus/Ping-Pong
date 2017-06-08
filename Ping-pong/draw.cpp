@@ -1,7 +1,8 @@
 #include "Platform.h"
 #include <vector>
-
-void Draw_field(std::vector<char>& PlayingField,
+#include "draw.h"
+#include <ncurses.h>
+void Draw::Draw_field(std::vector<char>& PlayingField,
                 int xPlayingField,
                 int yPlayingField) {
   clear();
@@ -15,7 +16,7 @@ void Draw_field(std::vector<char>& PlayingField,
   refresh();
 }
 
-bool Draw_win(int BallY, int yPlayingField) {
+bool Draw::Draw_win(int BallY, int yPlayingField) {
 	if (BallY == 1) {
     printw("\nThe player on the right won");
 		return 1;
