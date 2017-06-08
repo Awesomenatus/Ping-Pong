@@ -1,6 +1,6 @@
 #include <vector>
 #include "fill_vector.h"
-void Fill_vector::Fill_vector_platform(std::vector<char>& PlayingField,
+void Fill_vector_platform(std::vector<char>& PlayingField,
                           int Coordinate,
                           int Length,
                           int yPlayingField,
@@ -10,7 +10,7 @@ void Fill_vector::Fill_vector_platform(std::vector<char>& PlayingField,
   }
 }
 
-void Fill_vector::Fill_vector_border(std::vector<char>& PlayingField,
+void Fill_vector_border(std::vector<char>& PlayingField,
                         int xPlayingField,
                         int yPlayingField) {
   for (int count = 0; count < xPlayingField; count++) {
@@ -23,14 +23,14 @@ void Fill_vector::Fill_vector_border(std::vector<char>& PlayingField,
   }
 }
 
-void Fill_vector::Fill_vector_ball(std::vector<char>& PlayingField,
+void Fill_vector_ball(std::vector<char>& PlayingField,
                       int xBall,
                       int yBall,
                       int yPlayingField) {
   PlayingField[xBall * yPlayingField + yBall] = 'o';
 }
 
-void Fill_vector::Fill_vector_all_space(std::vector<char>& PlayingField,
+void Fill_vector_all_space(std::vector<char>& PlayingField,
                        int xPlayingField,
                        int yPlayingField) {
   for (int x = 0; x < xPlayingField * yPlayingField - 1; x++) {
@@ -38,6 +38,6 @@ void Fill_vector::Fill_vector_all_space(std::vector<char>& PlayingField,
   };
 }
 
-void Fill_vector::Fill_vector_space(std::vector<char>& PlayingField, int pos) {
+void Fill_vector_space(std::vector<char>& PlayingField, int pos) {
   PlayingField[pos] = ' ';
 }

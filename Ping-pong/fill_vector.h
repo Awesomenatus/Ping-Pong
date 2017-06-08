@@ -2,8 +2,6 @@
 #define H_FILL_VECTOR
 #include <vector>
 
-class Fill_vector{
-	public:
 	void Fill_vector_platform(std::vector<char>& PlayingField,
 														int Coordinate,
 														int Length,
@@ -24,6 +22,5 @@ class Fill_vector{
 												 int yPlayingField);
 
 	void Fill_vector_space(std::vector<char>& PlayingField, int pos);
-};
 
 #endif
