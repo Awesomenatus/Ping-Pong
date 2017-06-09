@@ -1,14 +1,12 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(Ping-Pong)
+project(ping-pong)
 
 find_package(GTest REQUIRED)
 
 include_directories(${GTEST_INCLUDE_DIRS})
 
-add_library(Ball STATIC Ball.cpp)
 
-set(SOURCE_EXE Source.cpp Platform.cpp draw.cpp fill_vector.cpp)
 
 find_package(Curses REQUIRED)
 
@@ -22,10 +20,21 @@ endif()
 
 include_directories(${CURSES_INCLUDE_DIR})
 
-add_executable(source ${SOURCE_EXE} )
+add_library(utility STATIC
+            utility.cpp
+            Ball.cpp)
+            
+target_link_libraries(utility ${CURSES_LIBRARIES})
 
-target_link_libraries(source ${CURSES_LIBRARIES} Ball)
+add_executable(${PROJECT_NAME} 
+               Source.cpp
+               Platform.cpp)
 
-add_executable(runTests ball_tests.cpp ping_pong_test_main.cpp )
+target_link_libraries(${PROJECT_NAME} utility)
 
-target_link_libraries(runTests ${GTEST_LIBRARIES} pthread Ball)
+add_executable(${PROJECT_NAME}_tests
+               ball_tests.cpp
+               fill_vector_tests.cpp
+               ping_pong_test_main.cpp)
+
+target_link_libraries(${PROJECT_NAME}_tests ${GTEST_LIBRARIES} pthread utility)
