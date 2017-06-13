@@ -14,7 +14,7 @@ class Ball {
   Ball(int x, int y);
   void xChange();
   void yChange();
-  void move(PlayingField PlayingField);
+  void move(PlayingField playing_field);
   int getX() const { return xCoordinate; };
   int getY() const { return yCoordinate; };
 };

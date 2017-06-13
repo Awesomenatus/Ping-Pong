@@ -4,49 +4,48 @@
 
 class fillvectorFixture : public ::testing::Test {
  public:
-  PlayingField Playingfield;
+  PlayingField* playing_field;
   int x, y;
   void SetUp() {
     x = 10;
     y = 10;
-    Playingfield.vector = std::vector<char>(x * y);
-    Playingfield.yPlayingField = 10;
+    playing_field = new PlayingField(x, y);
   }
 
   void TearDown() {}
 };
 
 TEST_F(fillvectorFixture, all_spacetest) {
-  Fill_vector_all_space(Playingfield, x);
-  for (int count = 0; count < (x * y - 1); count++)
-    ASSERT_EQ(' ', Playingfield.vector[count]);
+  Fill_vector_all_space(*playing_field);
+  for (int count = 0; count < (x * y); count++)
+    ASSERT_EQ(' ', playing_field->getChar(count));
 }
 
 TEST_F(fillvectorFixture, balltest) {
-  Fill_vector_ball(Playingfield, 5, 5);
-  ASSERT_EQ('o', Playingfield.vector[55]);
+  Fill_vector_ball(*playing_field, 5, 5);
+  ASSERT_EQ('o', playing_field->getChar(55));
 }
 
 TEST_F(fillvectorFixture, bordertest) {
-  Fill_vector_border(Playingfield, x);
+  Fill_vector_border(*playing_field);
   for (int count = 0; count < x; count++) {
-    ASSERT_EQ('X', Playingfield.vector[0 + count * y]);
-    ASSERT_EQ('X', Playingfield.vector[y - 1 + count * y]);
+    ASSERT_EQ('X', playing_field->getChar(0 + count * y));
+    ASSERT_EQ('X', playing_field->getChar(y - 1 + count * y));
   }
   for (int count = 0; count < y; count++) {
-    ASSERT_EQ('X', Playingfield.vector[0 + count]);
-    ASSERT_EQ('X', Playingfield.vector[0 + (x - 1) * y + count]);
+    ASSERT_EQ('X', playing_field->getChar(0 + count));
+    ASSERT_EQ('X', playing_field->getChar(0 + (x - 1) * y + count));
   }
 }
 
 TEST_F(fillvectorFixture, Platformtest) {
-  Fill_vector_platform(Playingfield, 3, 3, 2);
+  Fill_vector_platform(*playing_field, 3, 3, 2);
   for (int count = 3; count != 6; count++) {
-    ASSERT_EQ('|', Playingfield.vector[count * y + 2]);
+    ASSERT_EQ('|', playing_field->getChar(count * y + 2));
   }
 }
 
 TEST_F(fillvectorFixture, Spacetest) {
-  Fill_vector_space(Playingfield, 65);
-  ASSERT_EQ(' ', Playingfield.vector[65]);
+  Fill_vector_space(*playing_field, 6, 5);
+  ASSERT_EQ(' ', playing_field->getChar(65));
 }

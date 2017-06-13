@@ -33,6 +33,7 @@ add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} utility)
 
 add_executable(${PROJECT_NAME}_tests
+               class_playingfield_test.cpp
                ball_tests.cpp
                fill_vector_tests.cpp
                ping_pong_test_main.cpp)

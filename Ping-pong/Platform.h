@@ -18,7 +18,7 @@ class PlatformPlayer : public Platform  // Дочерний класс игро�
  public:
   PlatformPlayer(int length, int yCoordinate);
   void MoveUp();
-  void MoveDown(int xPlayingField);
+  void MoveDown(int x_playing_field);
 };
 class PlatformAI : public Platform  // Дочерний класс ИИ
 {
@@ -28,6 +28,6 @@ class PlatformAI : public Platform  // Дочерний класс ИИ
  public:
   PlatformAI(int length, int yCoordinate, int difficulty);
   void SetDifficulty(int difficulty);
-  int Move(int xPlayingField, int yPlayingField, int BallX, int BallY);
+  int Move(int x_playing_field, int y_playing_field, int BallX, int BallY);
 };
 #endif

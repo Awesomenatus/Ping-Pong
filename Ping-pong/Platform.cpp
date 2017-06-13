@@ -18,8 +18,8 @@ void PlatformPlayer::MoveUp() {
     this->xCoordinate--;
 }
 
-void PlatformPlayer::MoveDown(int xPlayingField) {
-  if ((xCoordinate + length) < xPlayingField - 1)
+void PlatformPlayer::MoveDown(int x_playing_field) {
+  if ((xCoordinate + length) < x_playing_field - 1)
     this->xCoordinate++;
 }
 
@@ -33,13 +33,13 @@ void PlatformAI::SetDifficulty(int x) {
   this->difficulty = x;
 }
 
-int PlatformAI::Move(int xPlayingField,
-                     int yPlayingField,
+int PlatformAI::Move(int x_playing_field,
+                     int y_playing_field,
                      int BallX,
                      int BallY) {
-  if ((BallY < (yPlayingField / difficulty))) {
+  if ((BallY < (y_playing_field / difficulty))) {
     if ((xCoordinate + length / 2 < BallX) &&
-        ((xCoordinate + length) < (xPlayingField - 1))) {
+        ((xCoordinate + length) < (x_playing_field - 1))) {
       this->xCoordinate++;
       return 1;
     } else if ((xCoordinate + length / 2 > BallX) && (xCoordinate > 1)) {
