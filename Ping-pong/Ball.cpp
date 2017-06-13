@@ -7,9 +7,7 @@ Ball::Ball(int x, int y) {
   srand(time(0));
   xCoordinate = x;
   yCoordinate = y;
-  (rand() % 10 + 1 < 5)
-      ? XMove = -1
-      : XMove = 1;  // случайное изначальное направление движения
+  (rand() % 10 + 1 < 5) ? XMove = -1 : XMove = 1;
   (rand() % 10 + 1 < 5) ? YMove = -1 : YMove = 1;
 }
 
@@ -21,25 +19,44 @@ void Ball::yChange() {
   YMove = -YMove;
 }
 
-void Ball::move(PlayingField playing_field) {
-  int Potential =
-      (xCoordinate + XMove) * playing_field.getY() + (yCoordinate + YMove);
-  if ((playing_field.getChar(Potential) == '|') &&
-      ((playing_field.getChar(Potential - XMove * playing_field.getY()) ==
-        ' '))) {
+void Ball::move(Platform platform_1,
+                Platform platform_2,
+                int x_playing_field,
+                int y_playing_field) {
+  int xPotential = (xCoordinate + XMove);
+  int yPotential = (yCoordinate + YMove);
+  if (((xPotential == platform_1.getxCoordinate()) && (yPotential == 2)) ||
+      ((xPotential == platform_2.getxCoordinate()) &&
+       (yPotential == (y_playing_field - 3)))) {
     xChange();
     yChange();
-    Potential = (xCoordinate + XMove) * (yCoordinate + YMove);
+    xPotential = (xCoordinate + XMove);
+    yPotential = (yCoordinate + YMove);
   }
-
-  if (playing_field.getChar(Potential) == 'X') {
+  if (((xPotential ==
+        (platform_1.getxCoordinate() + platform_1.getlength() - 1)) &&
+       (yPotential == 2)) ||
+      ((xPotential ==
+        (platform_2.getxCoordinate() + platform_2.getlength() - 1)) &&
+       (yPotential == (y_playing_field - 3)))) {
     xChange();
-    Potential = (xCoordinate + XMove) * (yCoordinate + YMove);
+    yChange();
+    xPotential = (xCoordinate + XMove);
+    yPotential = (yCoordinate + YMove);
+  }
+  if ((xPotential == 0) || (xPotential == (x_playing_field - 1))) {
+    xChange();
+    xPotential = (xCoordinate + XMove);
   }
 
-  if (playing_field.getChar(Potential) == '|') {
+  if (((xPotential > platform_1.getxCoordinate()) &&
+       (xPotential < (platform_1.getxCoordinate() + platform_1.getlength())) &&
+       (yPotential == 2)) ||
+      (((xPotential > platform_2.getxCoordinate())) &&
+       (xPotential < (platform_2.getxCoordinate() + platform_2.getlength())) &&
+       (yPotential == (y_playing_field - 3)))) {
     yChange();
-    Potential = (xCoordinate + XMove) * (yCoordinate + YMove);
+    yPotential = (yCoordinate + YMove);
   }
 
   xCoordinate += XMove;

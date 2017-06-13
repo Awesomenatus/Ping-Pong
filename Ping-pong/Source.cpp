@@ -35,19 +35,10 @@ int main() {
   PlatformPlayer scnd(platform_length,
                       ((x_playing_field - platform_length) / 2));
   Ball ball(x_playing_field / 2, y_playing_field / 2);
-  Fill_vector_all_space(playing_field);
-
-  Fill_vector_border(playing_field);
-
-  Fill_vector_platform(playing_field, scnd.getxCoordinate(), scnd.getlength(),
-                       playing_field.getY() - 3);
-  Fill_vector_platform(playing_field, frst.getxCoordinate(), frst.getlength(),
-                       2);
-  Fill_vector_platform(playing_field, frstAI.getxCoordinate(),
-                       frstAI.getlength(), 2);
-
-  Fill_vector_ball(playing_field, ball.getX(), ball.getY());
-  Draw_field(playing_field);
+  if (AICheck)
+    playing_field.drawField(frstAI, scnd, ball);
+  else
+    playing_field.drawField(frst, scnd, ball);
   while (true) {
     noecho();
     int n;
@@ -57,60 +48,39 @@ int main() {
     n = getch();
     switch (n) {
       case KEY_UP:
-        Fill_vector_space(playing_field,
-                          scnd.getxCoordinate() + scnd.getlength() - 1,
-                          playing_field.getY() - 3);
         scnd.MoveUp();
         break;
       case KEY_DOWN:
-        Fill_vector_space(playing_field, scnd.getxCoordinate(),
-                          playing_field.getY() - 3);
         scnd.MoveDown(x_playing_field);
         break;
     }
     if (!AICheck) {
       switch (n) {
         case 'w':
-          Fill_vector_space(playing_field,
-                            frst.getxCoordinate() + frst.getlength() - 1, 2);
           frst.MoveUp();
           break;
         case 's':
-          Fill_vector_space(playing_field, frst.getxCoordinate(), 2);
           frst.MoveDown(x_playing_field);
           break;
       }
+      ball.move(frst, scnd, x_playing_field, y_playing_field);
     } else {
-      int tmp = frstAI.Move(x_playing_field, y_playing_field, ball.getX(),
-                            ball.getY());
-      if (tmp == 1)
-        Fill_vector_space(playing_field, frstAI.getxCoordinate() - 1, 2);
-      else if (tmp == -1)
-        Fill_vector_space(playing_field,
-                          frstAI.getxCoordinate() + frstAI.getlength(), 2);
+      frstAI.Move(x_playing_field, y_playing_field, ball.getX(), ball.getY());
+      ball.move(frstAI, scnd, x_playing_field, y_playing_field);
     }
     if (n == 27)
       break;
     nodelay(stdscr, 0);
-    Fill_vector_space(playing_field, ball.getX(), ball.getY());
-    ball.move(playing_field);
-    if (Draw_win(ball.getY(), playing_field.getY())) {
-      break;
-    }
     if (AICheck) {
-      Fill_vector_platform(playing_field, frstAI.getxCoordinate(),
-                           frstAI.getlength(), 2);
+      if (playing_field.drawField(frstAI, scnd, ball)) {
+        break;
+      }
     } else {
-      Fill_vector_platform(playing_field, frst.getxCoordinate(),
-                           frst.getlength(), 2);
+      if (playing_field.drawField(frst, scnd, ball)) {
+        break;
+      }
     }
-    Fill_vector_platform(playing_field, scnd.getxCoordinate(), scnd.getlength(),
-                         playing_field.getY() - 3);
-    Fill_vector_ball(playing_field, ball.getX(), ball.getY());
-    clear();
-    Draw_field(playing_field);
   }
-  refresh();
   sleep(3);
   endwin();
   return 0;

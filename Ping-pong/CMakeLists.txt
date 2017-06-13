@@ -21,21 +21,20 @@ endif()
 include_directories(${CURSES_INCLUDE_DIR})
 
 add_library(utility STATIC
-            utility.cpp
-            Ball.cpp)
+            Platform.cpp
+            Ball.cpp
+            utility.cpp)
             
 target_link_libraries(utility ${CURSES_LIBRARIES})
 
 add_executable(${PROJECT_NAME} 
-               Source.cpp
-               Platform.cpp)
+               Source.cpp)
 
 target_link_libraries(${PROJECT_NAME} utility)
 
 add_executable(${PROJECT_NAME}_tests
                class_playingfield_test.cpp
                ball_tests.cpp
-               fill_vector_tests.cpp
                ping_pong_test_main.cpp)
 
 target_link_libraries(${PROJECT_NAME}_tests ${GTEST_LIBRARIES} pthread utility)

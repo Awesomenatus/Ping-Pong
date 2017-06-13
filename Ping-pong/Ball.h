@@ -1,7 +1,7 @@
 #ifndef H_BALL
 #define H_BALL
 #include <vector>
-#include "utility.h"
+#include "Platform.h"
 
 class Ball {
  protected:
@@ -14,7 +14,10 @@ class Ball {
   Ball(int x, int y);
   void xChange();
   void yChange();
-  void move(PlayingField playing_field);
+  void move(Platform platform_1,
+            Platform platform_2,
+            int x_playing_field,
+            int y_playing_field);
   int getX() const { return xCoordinate; };
   int getY() const { return yCoordinate; };
 };
