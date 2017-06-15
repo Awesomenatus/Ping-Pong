@@ -6,8 +6,6 @@
 #include "Ball.h"
 #include <memory>
 
-// using std::sharing_ptr;
-
 class PlayingField {
  protected:
   std::vector<char> Vector;
@@ -33,9 +31,7 @@ class PlatformController {
   virtual ~PlatformController();
 };
 
-class PlatformControllerPlayer
-    : public PlatformController  // Дочерний класс игрока/игроков
-{
+class PlatformControllerPlayer : public PlatformController {
  protected:
   int keyUP;
   int keyDown;
@@ -48,8 +44,7 @@ class PlatformControllerPlayer
   virtual ~PlatformControllerPlayer();
 };
 
-class PlatformControllerAI : public PlatformController  // Дочерний класс ИИ
-{
+class PlatformControllerAI : public PlatformController {
  protected:
   int difficulty;
 
@@ -62,15 +57,14 @@ class PlatformControllerAI : public PlatformController  // Дочерний кл
 
 class PlatformControllerFactory {
  public:
-  typedef std::shared_ptr<PlatformController> PlatformControllerPtr;
-  static PlatformControllerPtr newPlatformController(bool check,
-                                                     int up,
-                                                     int down,
-                                                     int difficulty) {
+  static std::unique_ptr<PlatformController>
+  newPlatformController(bool check, int up, int down, int difficulty) {
     if (check)
-      return PlatformControllerPtr(new PlatformControllerAI(difficulty));
+      return std::unique_ptr<PlatformController>(
+          new PlatformControllerAI(difficulty));
     else
-      return PlatformControllerPtr(new PlatformControllerPlayer(up, down));
+      return std::unique_ptr<PlatformController>(
+          new PlatformControllerPlayer(up, down));
   }
 };
 
