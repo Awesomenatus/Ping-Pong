@@ -73,6 +73,8 @@ bool PlayingField::drawField(Platform platform_1,
   return res;
 }
 
+PlatformController::~PlatformController() {}
+
 void PlatformControllerPlayer::setkeyUP(int c) {
   this->keyUP = c;
 }
@@ -85,6 +87,8 @@ PlatformControllerPlayer::PlatformControllerPlayer(int up, int down) {
   this->keyUP = up;
   this->keyDown = down;
 }
+
+PlatformControllerPlayer::~PlatformControllerPlayer() {}
 
 void PlatformControllerPlayer::Move(PlayingField playing_field,
                                     Platform& platform,
@@ -103,6 +107,8 @@ void PlatformControllerPlayer::Move(PlayingField playing_field,
 PlatformControllerAI::PlatformControllerAI(int difficulty) {
   this->difficulty = difficulty;
 }
+
+PlatformControllerAI::~PlatformControllerAI() {}
 
 void PlatformControllerAI::SetDifficulty(int x) {
   this->difficulty = x;

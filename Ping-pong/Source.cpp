@@ -35,10 +35,12 @@ int main() {
                          platform_length);
   Platform scnd_platform((x_playing_field - platform_length) / 2,
                          platform_length);
-  PlatformController* frst = PlatformControllerFactory::newPlatformController(
-      AICheck, 'w', 's', difficulty);
-  PlatformController* scnd = PlatformControllerFactory::newPlatformController(
-      0, KEY_UP, KEY_DOWN, difficulty);
+  shared_ptr<PlatformController> frst =
+      PlatformControllerFactory::newPlatformController(AICheck, 'w', 's',
+                                                       difficulty);
+  shared_ptr<PlatformController> scnd =
+      PlatformControllerFactory::newPlatformController(0, KEY_UP, KEY_DOWN,
+                                                       difficulty);
   playing_field.drawField(frst_platform, scnd_platform, ball);
   while (true) {
     noecho();
