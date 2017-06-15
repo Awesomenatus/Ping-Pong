@@ -10,6 +10,8 @@ using namespace std;
 int main() {
   initscr();
   echo();
+  keypad(stdscr, 1);
+  cbreak();
   int x_playing_field, y_playing_field, platform_length, difficulty;
   char AI;
   bool AICheck;
@@ -28,57 +30,29 @@ int main() {
   } else {
     AICheck = 0;
   }
-  PlatformAI frstAI(platform_length, ((x_playing_field - platform_length) / 2),
-                    difficulty);
-  PlatformPlayer frst(platform_length,
-                      ((x_playing_field - platform_length) / 2));
-  PlatformPlayer scnd(platform_length,
-                      ((x_playing_field - platform_length) / 2));
   Ball ball(x_playing_field / 2, y_playing_field / 2);
-  if (AICheck)
-    playing_field.drawField(frstAI, scnd, ball);
-  else
-    playing_field.drawField(frst, scnd, ball);
+  Platform frst_platform((x_playing_field - platform_length) / 2,
+                         platform_length);
+  Platform scnd_platform((x_playing_field - platform_length) / 2,
+                         platform_length);
+  PlatformController* frst = PlatformControllerFactory::newPlatformController(
+      AICheck, 'w', 's', difficulty);
+  PlatformController* scnd = PlatformControllerFactory::newPlatformController(
+      0, KEY_UP, KEY_DOWN, difficulty);
+  playing_field.drawField(frst_platform, scnd_platform, ball);
   while (true) {
     noecho();
-    int n;
     usleep(80000);
-    keypad(stdscr, 1);
     nodelay(stdscr, 1);
-    n = getch();
-    switch (n) {
-      case KEY_UP:
-        scnd.MoveUp();
-        break;
-      case KEY_DOWN:
-        scnd.MoveDown(x_playing_field);
-        break;
-    }
-    if (!AICheck) {
-      switch (n) {
-        case 'w':
-          frst.MoveUp();
-          break;
-        case 's':
-          frst.MoveDown(x_playing_field);
-          break;
-      }
-      ball.move(frst, scnd, x_playing_field, y_playing_field);
-    } else {
-      frstAI.Move(x_playing_field, y_playing_field, ball.getX(), ball.getY());
-      ball.move(frstAI, scnd, x_playing_field, y_playing_field);
-    }
+    int n = getch();
+    frst->Move(playing_field, frst_platform, ball, n);
+    scnd->Move(playing_field, scnd_platform, ball, n);
+    ball.move(frst_platform, scnd_platform, x_playing_field, y_playing_field);
     if (n == 27)
       break;
     nodelay(stdscr, 0);
-    if (AICheck) {
-      if (playing_field.drawField(frstAI, scnd, ball)) {
-        break;
-      }
-    } else {
-      if (playing_field.drawField(frst, scnd, ball)) {
-        break;
-      }
+    if (playing_field.drawField(frst_platform, scnd_platform, ball)) {
+      break;
     }
   }
   sleep(3);

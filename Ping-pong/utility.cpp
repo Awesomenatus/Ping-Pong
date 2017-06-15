@@ -72,3 +72,55 @@ bool PlayingField::drawField(Platform platform_1,
   refresh();
   return res;
 }
+
+void PlatformControllerPlayer::setkeyUP(int c) {
+  this->keyUP = c;
+}
+
+void PlatformControllerPlayer::setkeyDown(int c) {
+  this->keyDown = c;
+}
+
+PlatformControllerPlayer::PlatformControllerPlayer(int up, int down) {
+  this->keyUP = up;
+  this->keyDown = down;
+}
+
+void PlatformControllerPlayer::Move(PlayingField playing_field,
+                                    Platform& platform,
+                                    Ball ball,
+                                    int key) {
+  if (key == keyUP) {
+    if (platform.getxCoordinate() > 1)
+      platform.MoveUp();
+  } else if (key == keyDown) {
+    if ((platform.getxCoordinate() + platform.getlength()) <
+        (playing_field.getX() - 1))
+      platform.MoveDown();
+  }
+}
+
+PlatformControllerAI::PlatformControllerAI(int difficulty) {
+  this->difficulty = difficulty;
+}
+
+void PlatformControllerAI::SetDifficulty(int x) {
+  this->difficulty = x;
+}
+
+void PlatformControllerAI::Move(PlayingField playing_field,
+                                Platform& platform,
+                                Ball ball,
+                                int key) {
+  if ((ball.getY() < (playing_field.getY() / difficulty))) {
+    if ((platform.getxCoordinate() + platform.getlength() / 2 < ball.getX()) &&
+        ((platform.getxCoordinate() + platform.getlength()) <
+         (playing_field.getX() - 1))) {
+      platform.MoveDown();
+    } else if ((platform.getxCoordinate() + platform.getlength() / 2 >
+                ball.getX()) &&
+               (platform.getxCoordinate() > 1)) {
+      platform.MoveUp();
+    }
+  }
+}

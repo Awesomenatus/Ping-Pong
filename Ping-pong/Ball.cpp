@@ -1,3 +1,4 @@
+#include "Platform.h"
 #include "Ball.h"
 #include <stdlib.h>
 #include <time.h>
@@ -25,9 +26,10 @@ void Ball::move(Platform platform_1,
                 int y_playing_field) {
   int xPotential = (xCoordinate + XMove);
   int yPotential = (yCoordinate + YMove);
-  if (((xPotential == platform_1.getxCoordinate()) && (yPotential == 2)) ||
+  if (((xPotential == platform_1.getxCoordinate()) && (yPotential == 2) &&
+       (XMove == 1)) ||
       ((xPotential == platform_2.getxCoordinate()) &&
-       (yPotential == (y_playing_field - 3)))) {
+       (yPotential == (y_playing_field - 3)) && (XMove == 1))) {
     xChange();
     yChange();
     xPotential = (xCoordinate + XMove);
@@ -35,10 +37,10 @@ void Ball::move(Platform platform_1,
   }
   if (((xPotential ==
         (platform_1.getxCoordinate() + platform_1.getlength() - 1)) &&
-       (yPotential == 2)) ||
+       (yPotential == 2) && (XMove == -1)) ||
       ((xPotential ==
         (platform_2.getxCoordinate() + platform_2.getlength() - 1)) &&
-       (yPotential == (y_playing_field - 3)))) {
+       (yPotential == (y_playing_field - 3)) && (XMove == -1))) {
     xChange();
     yChange();
     xPotential = (xCoordinate + XMove);
@@ -49,11 +51,11 @@ void Ball::move(Platform platform_1,
     xPotential = (xCoordinate + XMove);
   }
 
-  if (((xPotential > platform_1.getxCoordinate()) &&
-       (xPotential < (platform_1.getxCoordinate() + platform_1.getlength())) &&
+  if (((xPotential >= platform_1.getxCoordinate()) &&
+       (xPotential <= (platform_1.getxCoordinate() + platform_1.getlength())) &&
        (yPotential == 2)) ||
-      (((xPotential > platform_2.getxCoordinate())) &&
-       (xPotential < (platform_2.getxCoordinate() + platform_2.getlength())) &&
+      ((xPotential >= platform_2.getxCoordinate()) &&
+       (xPotential <= (platform_2.getxCoordinate() + platform_2.getlength())) &&
        (yPotential == (y_playing_field - 3)))) {
     yChange();
     yPotential = (yCoordinate + YMove);
