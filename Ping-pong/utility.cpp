@@ -3,6 +3,7 @@
 #include "Ball.h"
 #include <ncurses.h>
 #include "utility.h"
+#include <string>
 
 PlayingField::PlayingField(int x, int y) {
   this->y_playing_field = y;
@@ -129,4 +130,18 @@ void PlatformControllerAI::Move(PlayingField playing_field,
       platform.MoveUp();
     }
   }
+}
+
+int EnterValue(std::string String, int left, int right) {
+  int res;
+  clear();
+  printw(String.c_str(), right);
+  scanw("%d", &res);
+  while ((res < left) || (res > right)) {
+    clear();
+    printw("Try again \n");
+    printw(String.c_str(), right);
+    scanw("%d", &res);
+  };
+  return res;
 }

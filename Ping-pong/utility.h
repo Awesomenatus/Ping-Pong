@@ -68,4 +68,5 @@ class PlatformControllerFactory {
   }
 };
 
+int EnterValue(std::string String, int left, int right);
 #endif
