@@ -12,7 +12,8 @@ int main() {
   echo();
   keypad(stdscr, 1);
   cbreak();
-  int x_playing_field, y_playing_field, platform_length, difficulty, mx, my;
+  int x_playing_field, y_playing_field, platform_length, difficulty, mx, my,
+      prepare_time = 0, speed = 80000, prepare_count = 0;
   char AI, new_game, new_game_new_value = 'y';
   bool AICheck;
 
@@ -61,9 +62,27 @@ int main() {
     auto scnd = PlatformControllerFactory::newPlatformController(
         0, KEY_UP, KEY_DOWN, difficulty);
     playing_field.drawField(frst_platform, scnd_platform, ball);
+    while (prepare_time < 3) {
+      usleep(100000);
+      cbreak();
+      nodelay(stdscr, 1);
+      int n = getch();
+      nodelay(stdscr, 0);
+      if (!AICheck)
+        frst->Move(playing_field, frst_platform, ball, n);
+      scnd->Move(playing_field, scnd_platform, ball, n);
+      playing_field.drawField(frst_platform, scnd_platform, ball);
+      printw("\nGame starts in %i...", 3 - prepare_time);
+      refresh();
+      prepare_count++;
+      if (prepare_count == 10) {
+        prepare_time++;
+        prepare_count = 0;
+      }
+    }
     while (true) {
       noecho();
-      usleep(80000);
+      usleep(speed);
       cbreak();
       nodelay(stdscr, 1);
       int n = getch();
