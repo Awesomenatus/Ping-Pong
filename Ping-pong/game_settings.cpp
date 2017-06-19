@@ -25,14 +25,14 @@ GameSettings getGameSettings() {
   getmaxyx(stdscr, mx, my);
 
   game_settings.playing_field_settings.x_playing_field = EnterValue(
-    "Enter the number of rows (less than %i but more than 5) \n", 5, mx);
+    "Enter the number of rows (less than %i but more than 12) \n", 12, mx);
 
   game_settings.playing_field_settings.y_playing_field = EnterValue(
-    "Enter the number of columns (less than %i but more than 10)\n", 10, my);
+    "Enter the number of columns (less than %i but more than 20)\n", 20, my);
 
   game_settings.platform_length =
     EnterValue("Enter the length of the platform (less than %i)\n", 1,
-                     game_settings.playing_field_settings.x_playing_field - 2);
+                     game_settings.playing_field_settings.x_playing_field / 5);
 
   clear();
   printw("Second player AI? (y / n)\n");
