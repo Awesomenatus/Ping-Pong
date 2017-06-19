@@ -22,14 +22,19 @@ int main() {
     if (new_game_new_value == 'y') {
       printw("Do you want to load the settings?\n");
       scanw("%c", &load);
-      if (load == 'y')
+      if (load == 'y') {
         game_settings = LoadSettings();
-      else
+        clear();
+      } else {
         game_settings = getGameSettings();
-      printw("Do you want to save the settings?\n");
-      scanw("%c", &save);
-      if ((save == 'y') && (load != 'y'))
-        SaveSettings(game_settings);
+        clear();
+        printw("Do you want to save the settings?\n");
+        scanw("%c", &save);
+        if (save == 'y') {
+          SaveSettings(game_settings);
+          clear();
+        }
+      }
     }
     refresh();
     GameObject game_object = GameObject(game_settings);
