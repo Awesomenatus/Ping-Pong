@@ -61,10 +61,12 @@ void Ball::move(Platform platform_1,
   }
 
   if (((xPotential >= platform_1.getxCoordinate()) &&
-       (xPotential <= (platform_1.getxCoordinate() + platform_1.getlength())) &&
+       (xPotential <=
+        (platform_1.getxCoordinate() + platform_1.getlength() - 1)) &&
        (yPotential == 2)) ||
       ((xPotential >= platform_2.getxCoordinate()) &&
-       (xPotential <= (platform_2.getxCoordinate() + platform_2.getlength())) &&
+       (xPotential <=
+        (platform_2.getxCoordinate() + platform_2.getlength() - 1)) &&
        (yPotential == (playing_field_settings.y_playing_field - 3)))) {
     yChange();
     yPotential = (yCoordinate + YMove);
