@@ -45,7 +45,8 @@ void PlatformControllerAI::Move(GameSettings game_settings,
                                 Platform& platform,
                                 Ball ball,
                                 int key) {
-  if ((ball.getY() < (game_settings.playing_field_settings.y_playing_field / difficulty))) {
+  if ((ball.getY() <
+       (game_settings.playing_field_settings.y_playing_field / difficulty))) {
     if ((platform.getxCoordinate() + platform.getlength() / 2 < ball.getX()) &&
         ((platform.getxCoordinate() + platform.getlength()) <
          (game_settings.playing_field_settings.x_playing_field - 1))) {

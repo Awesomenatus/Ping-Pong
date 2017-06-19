@@ -18,7 +18,7 @@ int main() {
 
   do {
     new_game = 0;
-    
+
     if (new_game_new_value == 'y') {
       printw("Do you want to load the settings?\n");
       scanw("%c", &load);
@@ -30,10 +30,10 @@ int main() {
       scanw("%c", &save);
       if ((save == 'y') && (load != 'y'))
         SaveSettings(game_settings);
-    }  
+    }
     refresh();
     GameObject game_object = GameObject(game_settings);
-    
+
     PrepareGame(game_object);
 
     Game(game_object);

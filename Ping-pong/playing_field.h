@@ -10,7 +10,7 @@ class PlayingField {
   PlayingFieldSettings playing_field_settings;
 
  public:
-  PlayingField(PlayingFieldSettings &playing_field_settings);
+  PlayingField(PlayingFieldSettings& playing_field_settings);
   PlayingField();
   int Position(int x, int y);
   void setChar(int pos, char c);

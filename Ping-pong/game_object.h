@@ -18,7 +18,7 @@ struct PlatformControllers {
 };
 
 struct GameObject {
-  GameObject(GameSettings &game_settings);
+  GameObject(GameSettings& game_settings);
   PlayingField playing_field;
   Ball ball;
   Platforms platform;
