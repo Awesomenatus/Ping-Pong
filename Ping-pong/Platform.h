@@ -4,6 +4,7 @@
 class Platform {
  public:
   Platform(int yCoordinate, int length);
+  Platform();
   int getlength() const { return length; };
   void setlength(int x);
   int getxCoordinate() const { return xCoordinate; };

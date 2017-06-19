@@ -23,7 +23,11 @@ endif()
 include_directories(${CURSES_INCLUDE_DIR})
 
 add_library(utility STATIC
+            game_settings.cpp
+            game_object.cpp
             Platform.cpp
+            platform_controller.cpp
+            playing_field.cpp
             Ball.cpp
             utility.cpp)
             

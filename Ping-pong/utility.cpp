@@ -1,72 +1,52 @@
 #include <vector>
-#include "Platform.h"
-#include "Ball.h"
 #include <ncurses.h>
 #include "utility.h"
 #include <string>
+#include "game_object.h"
+#include <unistd.h>
 
-PlayingField::PlayingField(int x, int y) {
-  this->y_playing_field = y;
-  this->x_playing_field = x;
-  this->Vector = std::vector<char>(x * y);
-}
-
-int PlayingField::Position(int x, int y) {
-  return (x * y_playing_field + y);
-}
-
-void PlayingField::setChar(int pos, char c) {
-  this->Vector.at(pos) = c;
-}
-
-char PlayingField::getChar(int pos) {
-  return (this->Vector.at(pos));
-}
-
-bool PlayingField::drawField(Platform platform_1,
-                             Platform platform_2,
-                             Ball ball) {
+bool DrawField (GameObject &game_object) {
   clear();
   curs_set(0);
   bool res;
-  if (ball.getY() == 1) {
+  if (game_object.ball.getY() == 1) {
     printw("The player on the right won");
     res = 1;
-  } else if (ball.getY() == y_playing_field - 2) {
+  } else if (game_object.ball.getY() == game_object.playing_field.getY() - 2) {
     printw("The player on the left won");
     res = 1;
   } else {
-    for (int count = 0; count < (x_playing_field * y_playing_field); count++) {
-      this->setChar(count, ' ');
+    for (int count = 0; count < (game_object.playing_field.getX() * game_object.playing_field.getY()); count++) {
+      game_object.playing_field.setChar(count, ' ');
     };
 
-    for (int count = 0; count < x_playing_field; count++) {
-      this->setChar(this->Position(count, 0), 'X');
-      this->setChar(this->Position(count, y_playing_field - 1), 'X');
+    for (int count = 0; count < game_object.playing_field.getX(); count++) {
+      game_object.playing_field.setChar(game_object.playing_field.Position(count, 0), 'X');
+      game_object.playing_field.setChar(game_object.playing_field.Position(count, game_object.playing_field. getY() - 1), 'X');
     }
-    for (int count = 0; count < this->getY(); count++) {
-      this->setChar(this->Position(0, count), 'X');
-      this->setChar(this->Position(x_playing_field - 1, count), 'X');
+    for (int count = 0; count < game_object.playing_field.getY(); count++) {
+      game_object.playing_field.setChar(game_object.playing_field.Position(0, count), 'X');
+      game_object.playing_field.setChar(game_object.playing_field.Position(game_object.playing_field. getX() - 1, count), 'X');
     }
 
-    this->setChar(this->Position(ball.getX(), ball.getY()), 'o');
+    game_object.playing_field.setChar(game_object.playing_field.Position(game_object.ball.getX(), game_object.ball.getY()), 'o');
 
-    for (int count = platform_1.getxCoordinate();
-         count != (platform_1.getxCoordinate() + platform_1.getlength());
+    for (int count = game_object.platform.frst_platform.getxCoordinate();
+         count != (game_object.platform.frst_platform.getxCoordinate() + game_object.platform.frst_platform.getlength());
          count++) {
-      this->setChar(this->Position(count, 2), '|');
+      game_object.playing_field.setChar(game_object.playing_field.Position(count, 2), '|');
     }
-    for (int count = platform_2.getxCoordinate();
-         count != (platform_2.getxCoordinate() + platform_2.getlength());
+    for (int count = game_object.platform.scnd_platform.getxCoordinate();
+         count != (game_object.platform.scnd_platform.getxCoordinate() + game_object.platform.scnd_platform.getlength());
          count++) {
-      this->setChar(this->Position(count, (this->y_playing_field) - 3), '|');
+      game_object.playing_field.setChar(game_object.playing_field.Position(count, (game_object.playing_field.getY()) - 3), '|');
     }
 
-    for (int x = 0; x < (x_playing_field * y_playing_field); x++) {
-      if (((x % (y_playing_field)) == 0) && (x != 0)) {
+    for (int x = 0; x < (game_object.playing_field.getX() * game_object.playing_field.getY()); x++) {
+      if (((x % (game_object.playing_field.getY())) == 0) && (x != 0)) {
         addch('\n');
       }
-      addch(this->getChar(x));
+      addch(game_object.playing_field.getChar(x));
     }
     res = 0;
   }
@@ -74,74 +54,44 @@ bool PlayingField::drawField(Platform platform_1,
   return res;
 }
 
-PlatformController::~PlatformController() {}
-
-void PlatformControllerPlayer::setkeyUP(int c) {
-  this->keyUP = c;
-}
-
-void PlatformControllerPlayer::setkeyDown(int c) {
-  this->keyDown = c;
-}
-
-PlatformControllerPlayer::PlatformControllerPlayer(int up, int down) {
-  this->keyUP = up;
-  this->keyDown = down;
-}
-
-PlatformControllerPlayer::~PlatformControllerPlayer() {}
-
-void PlatformControllerPlayer::Move(PlayingField playing_field,
-                                    Platform& platform,
-                                    Ball ball,
-                                    int key) {
-  if (key == keyUP) {
-    if (platform.getxCoordinate() > 1)
-      platform.MoveUp();
-  } else if (key == keyDown) {
-    if ((platform.getxCoordinate() + platform.getlength()) <
-        (playing_field.getX() - 1))
-      platform.MoveDown();
-  }
-}
-
-PlatformControllerAI::PlatformControllerAI(int difficulty) {
-  this->difficulty = difficulty;
-}
-
-PlatformControllerAI::~PlatformControllerAI() {}
-
-void PlatformControllerAI::SetDifficulty(int x) {
-  this->difficulty = x;
-}
-
-void PlatformControllerAI::Move(PlayingField playing_field,
-                                Platform& platform,
-                                Ball ball,
-                                int key) {
-  if ((ball.getY() < (playing_field.getY() / difficulty))) {
-    if ((platform.getxCoordinate() + platform.getlength() / 2 < ball.getX()) &&
-        ((platform.getxCoordinate() + platform.getlength()) <
-         (playing_field.getX() - 1))) {
-      platform.MoveDown();
-    } else if ((platform.getxCoordinate() + platform.getlength() / 2 >
-                ball.getX()) &&
-               (platform.getxCoordinate() > 1)) {
-      platform.MoveUp();
+void PrepareGame (GameObject &game_object) {
+  int prepare_count = 0, prepare_time = 0;
+  DrawField(game_object);
+  while (prepare_time < 3) {
+    usleep(100000);
+    cbreak();
+    nodelay(stdscr, 1);
+    int n = getch();
+    nodelay(stdscr, 0);
+    if (!game_object.game_settings.ai_settings.AICheck)
+      game_object.platform_controllers.frst->Move(game_object.game_settings, game_object.platform.frst_platform, game_object.ball, n);
+    game_object.platform_controllers.scnd->Move(game_object.game_settings, game_object.platform.scnd_platform, game_object.ball, n);
+    DrawField(game_object);
+    printw("\nGame starts in %i...", 3 - prepare_time);
+    refresh();
+    prepare_count++;
+    if (prepare_count == 10) {
+      prepare_time++;
+      prepare_count = 0;
     }
   }
 }
 
-int EnterValue(std::string String, int left, int right) {
-  int res;
-  clear();
-  printw(String.c_str(), right);
-  scanw("%d", &res);
-  while ((res < left) || (res > right)) {
-    clear();
-    printw("Try again \n");
-    printw(String.c_str(), right);
-    scanw("%d", &res);
-  };
-  return res;
+void Game (GameObject &game_object) {
+  while (true) {
+    noecho();
+    usleep(80000);
+    cbreak();
+    nodelay(stdscr, 1);
+    int n = getch();
+    nodelay(stdscr, 0);
+    game_object.platform_controllers.frst->Move(game_object.game_settings, game_object.platform.frst_platform, game_object.ball, n);
+    game_object.platform_controllers.scnd->Move(game_object.game_settings, game_object.platform.scnd_platform, game_object.ball, n);
+    game_object.ball.move(game_object.platform.frst_platform, game_object.platform.scnd_platform, game_object.game_settings.playing_field_settings);
+    if (n == 27)
+      break;
+    if (DrawField(game_object)) {
+      break;
+    }
+  }
 }

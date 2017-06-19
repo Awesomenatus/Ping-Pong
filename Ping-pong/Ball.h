@@ -2,6 +2,7 @@
 #define H_BALL
 #include <vector>
 #include "Platform.h"
+#include "game_settings.h"
 
 class Ball {
  protected:
@@ -12,12 +13,12 @@ class Ball {
 
  public:
   Ball(int x, int y);
+  Ball();
   void xChange();
   void yChange();
   void move(Platform platform_1,
             Platform platform_2,
-            int x_playing_field,
-            int y_playing_field);
+            PlayingFieldSettings playing_field_settings);
   int getX() const { return xCoordinate; };
   int getY() const { return yCoordinate; };
 };

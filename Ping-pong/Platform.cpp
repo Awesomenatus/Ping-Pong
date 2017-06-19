@@ -6,6 +6,10 @@ Platform::Platform(int xCoordinate, int length) {
   this->xCoordinate = xCoordinate;
 }
 
+Platform::Platform() {
+  this->length = 0;
+  this->xCoordinate = 0;
+}
 void Platform::setlength(int x) {
   this->length = x;
 }
