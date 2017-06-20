@@ -6,7 +6,7 @@
 int EnterValue(std::string String, int left, int right) {
   int res;
   clear();
-  printw(String.c_str(), right);
+  printw(String.c_str(), right, left);
   scanw("%d", &res);
   while ((res < left) || (res > right)) {
     clear();
@@ -19,16 +19,18 @@ int EnterValue(std::string String, int left, int right) {
 
 GameSettings getGameSettings() {
   GameSettings game_settings;
+  const int rows_min = 12,
+            cols_min = 20;
   int mx, my;
   bool AICheck;
   char AI;
   getmaxyx(stdscr, mx, my);
 
   game_settings.playing_field_settings.x_playing_field = EnterValue(
-      "Enter the number of rows (less than %i but more than 12) \n", 12, mx);
+      "Enter the number of rows (less than %i but more than %i) \n", rows_min, mx);
 
   game_settings.playing_field_settings.y_playing_field = EnterValue(
-      "Enter the number of columns (less than %i but more than 20)\n", 20, my);
+      "Enter the number of columns (less than %i but more than %i)\n", cols_min, my);
 
   game_settings.platform_length =
       EnterValue("Enter the length of the platform (less than %i)\n", 1,

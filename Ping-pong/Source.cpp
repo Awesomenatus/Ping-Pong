@@ -2,7 +2,6 @@
 #include <ncurses.h>
 #include "utility.h"
 #include "game_settings.h"
-#include "game_object.h"
 #include <unistd.h>
 
 using namespace std;
@@ -12,15 +11,14 @@ int main() {
   keypad(stdscr, 1);
   cbreak();
   GameSettings game_settings;
-  int prepare_time = 0, speed = 80000, prepare_count = 0, i;
-  char AI, new_game, new_game_new_value = 'y', save, load;
-  bool AICheck;
+  char new_game, new_game_new_value = 'y';
 
   do {
     new_game = 0;
-
     if (new_game_new_value == 'y') {
       printw("Do you want to load the settings?\n");
+      
+      char load;
       scanw("%c", &load);
       if (load == 'y') {
         game_settings = LoadSettings();
@@ -29,6 +27,8 @@ int main() {
         game_settings = getGameSettings();
         clear();
         printw("Do you want to save the settings?\n");
+        
+        char save;
         scanw("%c", &save);
         if (save == 'y') {
           SaveSettings(game_settings);

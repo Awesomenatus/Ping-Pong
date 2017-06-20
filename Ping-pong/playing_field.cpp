@@ -8,8 +8,7 @@ PlayingField::PlayingField(PlayingFieldSettings& playing_field_setting) {
 }
 
 PlayingField::PlayingField() {
-  // this->playing_field_settings = nullptr;
-  // this->Vector = std::vector<char>(0);
+
 }
 
 int PlayingField::Position(int x, int y) {

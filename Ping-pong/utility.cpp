@@ -5,6 +5,79 @@
 #include "game_object.h"
 #include <unistd.h>
 
+int WhoWin(Score& score) {
+  const int point_limit = 11;
+  if ((score.scnd_score >= point_limit) &&
+    (score.scnd_score > (score.frst_score + 1))) {
+    return 2;
+  } else if ((score.frst_score >= point_limit) &&
+        (score.frst_score > (score.scnd_score + 1))) {
+    return 1;
+  }
+  return 0;
+}
+
+int ScoreCount(GameObject& game_object, Score& score) {
+  if (game_object.ball.getY() == 1) {
+    printw("\nThe player on the right won round.");
+    score.scnd_score++;
+    if (WhoWin(score) == 2) {
+      printw("\nThe player on the right won game.");
+      return 2;
+    }
+    return 3;
+  } else if (game_object.ball.getY() == game_object.playing_field.getY() - 2) {
+    printw("\nThe player on the left won round.");
+    score.frst_score++;
+    if (WhoWin(score) == 1) {
+      printw("\nThe player on the left won game.");
+      return 1;
+    }
+    return 3;
+  }
+  return 0;
+}
+
+void DrawPlatform(Platform& platform, PlayingField& playing_field, int player) {
+  for (int count = platform.getxCoordinate();
+     count != (platform.getxCoordinate() + platform.getlength()); count++) {
+    playing_field.setChar(playing_field.Position(count, player), '|');
+  }
+}
+
+void DrawBorder (PlayingField& playing_field) {
+  for (int count = 0; count < playing_field.getX(); count++) {
+    playing_field.setChar(
+       playing_field.Position(count, 0), 'X');
+    playing_field.setChar(
+        playing_field.Position(
+            count, playing_field.getY() - 1),
+        'X');
+  };
+  for (int count = 0; count < playing_field.getY(); count++) {
+    playing_field.setChar(
+        playing_field.Position(0, count), 'X');
+    playing_field.setChar(
+        playing_field.Position(playing_field.getX() - 1,
+                                           count),
+        'X');
+  };
+}
+
+void DrawBall(GameObject& game_object) {
+  game_object.playing_field.setChar(
+      game_object.playing_field.Position(game_object.ball.getX(),
+                                         game_object.ball.getY()),
+      'o');
+}
+
+int ReadUserInput () {
+  nodelay(stdscr, 1);
+  int n = getch();
+  nodelay(stdscr, 0);
+  return n;
+}
+
 void DrawField(GameObject& game_object, Score& score) {
   clear();
   curs_set(0);
@@ -14,44 +87,14 @@ void DrawField(GameObject& game_object, Score& score) {
     game_object.playing_field.setChar(count, ' ');
   };
 
-  for (int count = 0; count < game_object.playing_field.getX(); count++) {
-    game_object.playing_field.setChar(
-        game_object.playing_field.Position(count, 0), 'X');
-    game_object.playing_field.setChar(
-        game_object.playing_field.Position(
-            count, game_object.playing_field.getY() - 1),
-        'X');
-  }
-  for (int count = 0; count < game_object.playing_field.getY(); count++) {
-    game_object.playing_field.setChar(
-        game_object.playing_field.Position(0, count), 'X');
-    game_object.playing_field.setChar(
-        game_object.playing_field.Position(game_object.playing_field.getX() - 1,
-                                           count),
-        'X');
-  }
+  DrawBorder(game_object.playing_field);
 
-  game_object.playing_field.setChar(
-      game_object.playing_field.Position(game_object.ball.getX(),
-                                         game_object.ball.getY()),
-      'o');
+  DrawBall(game_object);
 
-  for (int count = game_object.platform.frst_platform.getxCoordinate();
-       count != (game_object.platform.frst_platform.getxCoordinate() +
-                 game_object.platform.frst_platform.getlength());
-       count++) {
-    game_object.playing_field.setChar(
-        game_object.playing_field.Position(count, 2), '|');
-  }
-  for (int count = game_object.platform.scnd_platform.getxCoordinate();
-       count != (game_object.platform.scnd_platform.getxCoordinate() +
-                 game_object.platform.scnd_platform.getlength());
-       count++) {
-    game_object.playing_field.setChar(
-        game_object.playing_field.Position(
-            count, (game_object.playing_field.getY()) - 3),
-        '|');
-  }
+  int PlayerPosition = 2;
+  DrawPlatform(game_object.platform.frst_platform, game_object.playing_field, PlayerPosition);
+  PlayerPosition = game_object.playing_field.getY() - 3;
+  DrawPlatform(game_object.platform.scnd_platform, game_object.playing_field, PlayerPosition);
 
   for (int x = 0; x < (game_object.playing_field.getX() *
                        game_object.playing_field.getY());
@@ -60,16 +103,17 @@ void DrawField(GameObject& game_object, Score& score) {
       addch('\n');
     }
     addch(game_object.playing_field.getChar(x));
-  }
+  };
   printw("\n%i : %i", score.frst_score, score.scnd_score);
   refresh();
 }
 
 void PrepareGame(GameObject& game_object, Score& score) {
   int prepare_count = 0, prepare_time = 0;
+  const int frame_prepare_duration = 100000;
   DrawField(game_object, score);
   while (prepare_time < 3) {
-    usleep(100000);
+    usleep(frame_prepare_duration);
     cbreak();
     nodelay(stdscr, 1);
     int n = getch();
@@ -82,7 +126,7 @@ void PrepareGame(GameObject& game_object, Score& score) {
         game_object.game_settings, game_object.platform.scnd_platform,
         game_object.ball, n);
     DrawField(game_object, score);
-    printw("\nGame starts in %i...", 3 - prepare_time);
+    printw("\nRound starts in %i...", 3 - prepare_time);
     refresh();
     prepare_count++;
     if (prepare_count == 10) {
@@ -93,38 +137,37 @@ void PrepareGame(GameObject& game_object, Score& score) {
 }
 
 int GameControl(GameObject& game_object, Score& score) {
-  int i;
   while (true) {
+    const int frame_duration = 80000;
     noecho();
-    usleep(80000);
+    usleep(frame_duration);
     cbreak();
-    nodelay(stdscr, 1);
-    int n = getch();
-    nodelay(stdscr, 0);
-    i = ScoreCount(game_object, score);
+    const int esc_key = 27;
+    int pressed_key = ReadUserInput();
+    if (pressed_key == esc_key) {
+      return 0;
+    }
+    const int who_finished_round = ScoreCount(game_object, score);
+    const int no_one = 0;
     refresh();
-    if (i != 0) {
-      return i;
+    if (who_finished_round != no_one) {
+      return who_finished_round;
     }
     game_object.platform_controllers.frst->Move(
         game_object.game_settings, game_object.platform.frst_platform,
-        game_object.ball, n);
+        game_object.ball, pressed_key);
     game_object.platform_controllers.scnd->Move(
         game_object.game_settings, game_object.platform.scnd_platform,
-        game_object.ball, n);
+        game_object.ball, pressed_key);
     game_object.ball.move(game_object.platform.frst_platform,
                           game_object.platform.scnd_platform,
                           game_object.game_settings.playing_field_settings);
     DrawField(game_object, score);
-    if (n == 27) {
-      return -1;
-    }
   }
-  return 0;
 }
 
 void Game(GameSettings& game_settings) {
-  int i;
+  int i = 0;
   Score score;
   score.frst_score = 0;
   score.scnd_score = 0;
@@ -132,32 +175,8 @@ void Game(GameSettings& game_settings) {
     GameObject game_object = GameObject(game_settings);
     PrepareGame(game_object, score);
     i = GameControl(game_object, score);
-    if (i == -1)
+    if (i == 0)
       break;
     getch();
-    usleep(100000);
   };
-}
-
-int ScoreCount(GameObject& game_object, Score& score) {
-  if (game_object.ball.getY() == 1) {
-    printw("\nThe player on the right won round.");
-    score.scnd_score++;
-    if ((score.scnd_score >= 11) &&
-        (score.scnd_score > (score.frst_score + 1))) {
-      printw("\nThe player on the right won game.");
-      return 2;
-    }
-    return 3;
-  } else if (game_object.ball.getY() == game_object.playing_field.getY() - 2) {
-    printw("\nThe player on the left won round.");
-    score.frst_score++;
-    if ((score.frst_score >= 11) &&
-        (score.frst_score > (score.scnd_score + 1))) {
-      printw("\nThe player on the left won game.");
-      return 1;
-    }
-    return 3;
-  }
-  return 0;
 }
