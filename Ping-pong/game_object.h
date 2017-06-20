@@ -7,6 +7,11 @@
 #include "game_settings.h"
 #include <memory>
 
+struct Score {
+  int frst_score;
+  int scnd_score;
+};
+
 struct Platforms {
   Platform frst_platform;
   Platform scnd_platform;

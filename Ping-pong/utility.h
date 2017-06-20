@@ -4,9 +4,13 @@
 #include <memory>
 #include "game_object.h"
 
-bool DrawField(GameObject& game_object);
+void DrawField(GameObject& game_object, Score& score);
 
-void PrepareGame(GameObject& game_object);
+void PrepareGame(GameObject& game_object, Score& score);
 
-void Game(GameObject& game_object);
+int GameControl(GameObject& game_object, Score& score);
+
+void Game(GameSettings& game_settings);
+
+int ScoreCount(GameObject& game_object, Score& score);
 #endif

@@ -12,7 +12,7 @@ int main() {
   keypad(stdscr, 1);
   cbreak();
   GameSettings game_settings;
-  int prepare_time = 0, speed = 80000, prepare_count = 0;
+  int prepare_time = 0, speed = 80000, prepare_count = 0, i;
   char AI, new_game, new_game_new_value = 'y', save, load;
   bool AICheck;
 
@@ -37,11 +37,7 @@ int main() {
       }
     }
     refresh();
-    GameObject game_object = GameObject(game_settings);
-
-    PrepareGame(game_object);
-
-    Game(game_object);
+    Game(game_settings);
     sleep(2);
     echo();
     clear();
