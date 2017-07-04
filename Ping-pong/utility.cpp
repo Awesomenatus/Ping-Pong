@@ -4,8 +4,15 @@
 #include <string>
 #include "game_object.h"
 #include <unistd.h>
+#include <thread>
+#include "network.h"
+#include <mutex>
 
-int WhoWin(Score& score) {
+using namespace std;
+
+mutex mutex_main_thread;
+
+int WhoWin(Score& score) { //rewrite with using enum;
   const int point_limit = 11;
   if ((score.scnd_score >= point_limit) &&
     (score.scnd_score > (score.frst_score + 1))) {
@@ -79,7 +86,7 @@ int ReadUserInput () {
 }
 
 void DrawField(GameObject& game_object, Score& score) {
-  clear();
+  wclear(stdscr);
   curs_set(0);
   for (int count = 0; count < (game_object.playing_field.getX() *
                                game_object.playing_field.getY());
@@ -118,7 +125,7 @@ void PrepareGame(GameObject& game_object, Score& score) {
     nodelay(stdscr, 1);
     int n = getch();
     nodelay(stdscr, 0);
-    if (!game_object.game_settings.ai_settings.AICheck)
+    if ((!game_object.game_settings.ai_settings.AICheck) || (game_object.game_settings.network.isNetwork))
       game_object.platform_controllers.frst->Move(
           game_object.game_settings, game_object.platform.frst_platform,
           game_object.ball, n);
@@ -136,47 +143,81 @@ void PrepareGame(GameObject& game_object, Score& score) {
   }
 }
 
-int GameControl(GameObject& game_object, Score& score) {
+int GameControl(GameObject& game_object, Score& score, TaskQueue& task_queue, std::unique_ptr<NetworkClass>&& network_class) {
   while (true) {
-    const int frame_duration = 80000;
-    noecho();
-    usleep(frame_duration);
-    cbreak();
+    const int frame_duration = 70000;
     const int esc_key = 27;
-    int pressed_key = ReadUserInput();
-    if (pressed_key == esc_key) {
-      return 0;
+    int pressed_key_network;
+    if ((!game_object.game_settings.network.isServer) && (game_object.game_settings.network.isNetwork)) {
+      noecho();
+      usleep(frame_duration);
+      cbreak();
+      int pressed_key = ReadUserInput();
+      if (pressed_key == esc_key) {
+        return 0;
+      }
+      const int who_finished_round = ScoreCount(game_object, score);
+      const int no_one = 0;
+      refresh();
+      if (who_finished_round != no_one) {
+        return who_finished_round;
+      }
+      task_queue.AddTask([&] () {network_class->Game(game_object, score, pressed_key_network); return 0;});
+      DrawField(game_object, score);
+    } else {
+      noecho();
+      usleep(frame_duration);
+      cbreak();
+      int pressed_key = ReadUserInput();
+      if (pressed_key == esc_key) {
+        return 0;
+      }
+      const int who_finished_round = ScoreCount(game_object, score);
+      const int no_one = 0;
+      refresh();
+      if (who_finished_round != no_one) {
+        return who_finished_round;
+      }
+      if (game_object.game_settings.network.isNetwork)
+        task_queue.AddTask([&] () {network_class->Game(game_object, score, pressed_key_network); return 0;});
+      game_object.platform_controllers.scnd->Move(
+          game_object.game_settings, game_object.platform.scnd_platform,
+          game_object.ball, pressed_key);
+      if (!game_object.game_settings.network.isNetwork) {
+        pressed_key_network = pressed_key;
+      }
+      game_object.platform_controllers.frst->Move(
+          game_object.game_settings, game_object.platform.frst_platform,
+          game_object.ball, pressed_key_network);
+      game_object.ball.move(game_object.platform.frst_platform,
+                            game_object.platform.scnd_platform,
+                            game_object.game_settings.playing_field_settings);
+      DrawField(game_object, score);
     }
-    const int who_finished_round = ScoreCount(game_object, score);
-    const int no_one = 0;
-    refresh();
-    if (who_finished_round != no_one) {
-      return who_finished_round;
-    }
-    game_object.platform_controllers.frst->Move(
-        game_object.game_settings, game_object.platform.frst_platform,
-        game_object.ball, pressed_key);
-    game_object.platform_controllers.scnd->Move(
-        game_object.game_settings, game_object.platform.scnd_platform,
-        game_object.ball, pressed_key);
-    game_object.ball.move(game_object.platform.frst_platform,
-                          game_object.platform.scnd_platform,
-                          game_object.game_settings.playing_field_settings);
-    DrawField(game_object, score);
   }
 }
 
 void Game(GameSettings& game_settings) {
-  int i = 0;
+  int round_result = 0;
+  TaskQueue task_queue;
+  thread network(Network, ref(task_queue));  
+  std::unique_ptr<NetworkClass> network_class = NetworkClassFactory::newNetworkClass(game_settings);
+  if (game_settings.network.isNetwork) {
+    std::condition_variable connect_check;
+    task_queue.AddTask([&] () {network_class->Connect(game_settings, connect_check); return 0;});
+    std::unique_lock<std::mutex> lock(mutex_main_thread);
+    connect_check.wait(lock);
+  }
   Score score;
   score.frst_score = 0;
   score.scnd_score = 0;
-  while ((i != 1) && (i != 2)) {
-    GameObject game_object = GameObject(game_settings);
+  while ((round_result != 1) && (round_result != 2)) {
+    GameObject game_object(game_settings);
     PrepareGame(game_object, score);
-    i = GameControl(game_object, score);
-    if (i == 0)
+    round_result = GameControl(game_object, score, task_queue, std::move(network_class));
+    if (round_result == 0)
       break;
-    getch();
   };
+  task_queue.AddTask([] () {return 1;});
+  network.join();
 }

@@ -11,10 +11,25 @@ int EnterValue(std::string String, int left, int right) {
   while ((res < left) || (res > right)) {
     clear();
     printw("Try again \n");
-    printw(String.c_str(), right);
+    printw(String.c_str(), right, left);
     scanw("%d", &res);
   };
   return res;
+}
+
+PlayingFieldSettings SetPlayingField(int rows_min, int cols_min, int mx, int my) {
+  PlayingFieldSettings playing_field;
+  playing_field.x_playing_field = EnterValue(
+        "Enter the number of rows (less than %i but more than %i) \n", rows_min, mx);
+
+  playing_field.y_playing_field = EnterValue(
+        "Enter the number of columns (less than %i but more than %i)\n", cols_min, my);
+  return playing_field;
+}
+
+int SetPlatform (int x_playing_field) {
+  return EnterValue("Enter the length of the platform (less than %i)\n", 1,
+                   x_playing_field / 5);
 }
 
 GameSettings getGameSettings() {
@@ -22,37 +37,60 @@ GameSettings getGameSettings() {
   const int rows_min = 12,
             cols_min = 20;
   int mx, my;
-  bool AICheck;
   char AI;
   getmaxyx(stdscr, mx, my);
 
-  game_settings.playing_field_settings.x_playing_field = EnterValue(
-      "Enter the number of rows (less than %i but more than %i) \n", rows_min, mx);
-
-  game_settings.playing_field_settings.y_playing_field = EnterValue(
-      "Enter the number of columns (less than %i but more than %i)\n", cols_min, my);
-
-  game_settings.platform_length =
-      EnterValue("Enter the length of the platform (less than %i)\n", 1,
-                 game_settings.playing_field_settings.x_playing_field / 5);
-
-  clear();
-  printw("Second player AI? (y / n)\n");
-  scanw("%c", &AI);
-  while ((AI != 'y') && (AI != 'n')) {
-    clear();
-    printw("Try again \n");
-    printw("Second player AI? (y / n)\n");
-    scanw("%c", &AI);
-  };
-
-  if ((AI == 'y') || (AI == 'Y')) {
-    game_settings.ai_settings.difficulty =
-        EnterValue("Game difficulty (1-hard,2-normal, 3-easy)\n", 1, 3);
-    game_settings.ai_settings.AICheck = 1;
-  } else {
+  printw ("You want play online?\n");
+  char network;
+  scanw("%c", &network);
+  if (network == 'y') {
     game_settings.ai_settings.AICheck = 0;
     game_settings.ai_settings.difficulty = 0;
+    game_settings.network.isNetwork = 1;
+    printw ("You want to be server?\n");
+    char server;
+    scanw("%c", &server);
+    if (server == 'y')  {
+    
+      game_settings.playing_field_settings = SetPlayingField(rows_min, cols_min, mx, my);
+    
+      game_settings.platform_length = SetPlatform(game_settings.playing_field_settings.x_playing_field);
+            
+      game_settings.network.isServer = 1;
+    
+    } else {
+      printw ("Enter server's IP\n");
+      auto &IPServer = game_settings.network.IPServer;
+      IPServer.reserve(16);
+      scanw("%16s", IPServer.data());
+      
+      game_settings.network.isServer = 0;
+    }
+  } else {
+    game_settings.network.isNetwork = 0;
+    
+    game_settings.playing_field_settings = SetPlayingField(rows_min, cols_min, mx, my);
+    
+    game_settings.platform_length = SetPlatform(game_settings.playing_field_settings.x_playing_field);
+
+    clear();
+    printw("Second player AI? (y / n)\n");
+    scanw("%c", &AI);
+    while ((AI != 'y') && (AI != 'n')) {
+      clear();
+      printw("Try again \n");
+      printw("Second player AI? (y / n)\n");
+      scanw("%c", &AI);
+    };
+
+    if ((AI == 'y') || (AI == 'Y')) {
+      game_settings.ai_settings.difficulty =
+          EnterValue("Game difficulty (1-hard,2-normal, 3-easy)\n", 1, 3);
+      game_settings.ai_settings.AICheck = 1;
+    } else {
+      game_settings.ai_settings.AICheck = 0;
+      game_settings.ai_settings.difficulty = 0;
+    }
   }
   return game_settings;
 }
@@ -93,7 +131,21 @@ GameSettings LoadSettings() {
     game_settings.ai_settings.difficulty =
         std::stoi(tmp.substr(tmp.rfind(" ")));
     fin.close();
+    game_settings.network.isNetwork = 0;
+    game_settings.network.isServer = 0;
+    game_settings.network.IPServer = " ";
   } else
     printw("Unable to open file");
   return game_settings;
+}
+
+GameSettings::GameSettings() {
+  playing_field_settings.y_playing_field = 0;
+  playing_field_settings.x_playing_field = 0;
+  platform_length = 0;
+  ai_settings.difficulty = 0;
+  ai_settings.AICheck = 0;
+  network.isNetwork = 0;
+  network.isServer = 0;
+  network.IPServer = "";
 }

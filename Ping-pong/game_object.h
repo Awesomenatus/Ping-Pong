@@ -1,5 +1,6 @@
 #ifndef H_GAMEOBJECT
 #define H_GAMEOBJECT
+
 #include "Platform.h"
 #include "platform_controller.h"
 #include "playing_field.h"

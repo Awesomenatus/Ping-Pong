@@ -75,3 +75,11 @@ void Ball::move(Platform platform_1,
   xCoordinate += XMove;
   yCoordinate += YMove;
 }
+
+void Ball::setX(int x) {
+  xCoordinate = x;   
+}
+
+void Ball::setY(int y) {
+  yCoordinate = y;
+}

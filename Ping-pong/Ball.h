@@ -21,6 +21,8 @@ class Ball {
             PlayingFieldSettings playing_field_settings);
   int getX() const { return xCoordinate; };
   int getY() const { return yCoordinate; };
+  void setX(int x);
+  void setY(int y);
 };
 
 #endif
