@@ -7,9 +7,7 @@ PlayingField::PlayingField(PlayingFieldSettings& playing_field_setting) {
                                    playing_field_setting.y_playing_field);
 }
 
-PlayingField::PlayingField() {
-
-}
+PlayingField::PlayingField() {}
 
 int PlayingField::Position(int x, int y) {
   return (x * playing_field_settings.y_playing_field + y);

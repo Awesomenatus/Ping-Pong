@@ -17,61 +17,68 @@ int EnterValue(std::string String, int left, int right) {
   return res;
 }
 
-PlayingFieldSettings SetPlayingField(int rows_min, int cols_min, int mx, int my) {
+PlayingFieldSettings SetPlayingField(int rows_min,
+                                     int cols_min,
+                                     int mx,
+                                     int my) {
   PlayingFieldSettings playing_field;
-  playing_field.x_playing_field = EnterValue(
-        "Enter the number of rows (less than %i but more than %i) \n", rows_min, mx);
+  playing_field.x_playing_field =
+      EnterValue("Enter the number of rows (less than %i but more than %i) \n",
+                 rows_min, mx);
 
   playing_field.y_playing_field = EnterValue(
-        "Enter the number of columns (less than %i but more than %i)\n", cols_min, my);
+      "Enter the number of columns (less than %i but more than %i)\n", cols_min,
+      my);
   return playing_field;
 }
 
-int SetPlatform (int x_playing_field) {
+int SetPlatform(int x_playing_field) {
   return EnterValue("Enter the length of the platform (less than %i)\n", 1,
-                   x_playing_field / 5);
+                    x_playing_field / 5);
 }
 
 GameSettings getGameSettings() {
   GameSettings game_settings;
-  const int rows_min = 12,
-            cols_min = 20;
+  const int rows_min = 12, cols_min = 20;
   int mx, my;
   char AI;
   getmaxyx(stdscr, mx, my);
 
-  printw ("You want play online?\n");
+  printw("You want play online?\n");
   char network;
   scanw("%c", &network);
   if (network == 'y') {
     game_settings.ai_settings.AICheck = 0;
     game_settings.ai_settings.difficulty = 0;
     game_settings.network.isNetwork = 1;
-    printw ("You want to be server?\n");
+    printw("You want to be server?\n");
     char server;
     scanw("%c", &server);
-    if (server == 'y')  {
-    
-      game_settings.playing_field_settings = SetPlayingField(rows_min, cols_min, mx, my);
-    
-      game_settings.platform_length = SetPlatform(game_settings.playing_field_settings.x_playing_field);
-            
+    if (server == 'y') {
+      game_settings.playing_field_settings =
+          SetPlayingField(rows_min, cols_min, mx, my);
+
+      game_settings.platform_length =
+          SetPlatform(game_settings.playing_field_settings.x_playing_field);
+
       game_settings.network.isServer = 1;
-    
+
     } else {
-      printw ("Enter server's IP\n");
-      auto &IPServer = game_settings.network.IPServer;
+      printw("Enter server's IP\n");
+      auto& IPServer = game_settings.network.IPServer;
       IPServer.reserve(16);
       scanw("%16s", IPServer.data());
-      
+
       game_settings.network.isServer = 0;
     }
   } else {
     game_settings.network.isNetwork = 0;
-    
-    game_settings.playing_field_settings = SetPlayingField(rows_min, cols_min, mx, my);
-    
-    game_settings.platform_length = SetPlatform(game_settings.playing_field_settings.x_playing_field);
+
+    game_settings.playing_field_settings =
+        SetPlayingField(rows_min, cols_min, mx, my);
+
+    game_settings.platform_length =
+        SetPlatform(game_settings.playing_field_settings.x_playing_field);
 
     clear();
     printw("Second player AI? (y / n)\n");

@@ -77,7 +77,7 @@ void Ball::move(Platform platform_1,
 }
 
 void Ball::setX(int x) {
-  xCoordinate = x;   
+  xCoordinate = x;
 }
 
 void Ball::setY(int y) {

@@ -12,22 +12,22 @@ int main() {
   cbreak();
   GameSettings game_settings;
   char new_game, new_game_new_value = 'y';
+  printw("Do you want to load the settings?\n");
 
+  char load;
+  scanw("%c", &load);
   do {
     new_game = 0;
     if (new_game_new_value == 'y') {
-      printw("Do you want to load the settings?\n");
-      
-      char load;
-      scanw("%c", &load);
       if (load == 'y') {
         game_settings = LoadSettings();
         clear();
+        load = ' ';
       } else {
         game_settings = getGameSettings();
         clear();
         printw("Do you want to save the settings?\n");
-        
+
         char save;
         scanw("%c", &save);
         if (save == 'y') {
@@ -41,7 +41,7 @@ int main() {
     sleep(2);
     echo();
     clear();
-    printw("Restart game?\n");
+    printw("Try again?\n");
     scanw("%c", &new_game);
     if (new_game == 'y') {
       printw("Enter new value?\n");

@@ -25,7 +25,7 @@ struct GameSettings {
   int platform_length;
   AISettings ai_settings;
   NetworkSettings network;
-  
+
   GameSettings();
 };
 
