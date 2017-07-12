@@ -113,7 +113,7 @@ void DrawField(GameObject& game_object, Score& score) {
 }
 
 void PrepareGame(GameObject& game_object, Score& score, TaskQueue& task_queue,
-                std::unique_ptr<NetworkClass>&& network_class, std::exception_ptr& thread_exception) {
+                std::unique_ptr<NetworkClass>& network_class, std::exception_ptr& thread_exception) {
   int prepare_count = 0, prepare_time = 0, pressed_key, pressed_key_network = 0;
   const int frame_prepare_duration = 100000;
   DrawField(game_object, score);
@@ -162,7 +162,7 @@ void PrepareGame(GameObject& game_object, Score& score, TaskQueue& task_queue,
 int GameControl(GameObject& game_object,
                 Score& score,
                 TaskQueue& task_queue,
-                std::unique_ptr<NetworkClass>&& network_class, std::exception_ptr& thread_exception) {
+                std::unique_ptr<NetworkClass>& network_class, std::exception_ptr& thread_exception) {
   while (true) {
     const int frame_duration = 70000;
     const int esc_key = 27;
@@ -264,9 +264,9 @@ void Game(GameSettings& game_settings) {
   } else {
       while ((round_result != 1) && (round_result != 2)) {
       GameObject game_object(game_settings);
-      PrepareGame(game_object, score, task_queue, std::move(network_class), thread_exception);
+      PrepareGame(game_object, score, task_queue, network_class, thread_exception);
         round_result =
-      GameControl(game_object, score, task_queue, std::move(network_class), thread_exception);
+      GameControl(game_object, score, task_queue, network_class, thread_exception);
       if (thread_exception) {
         try {
           std::rethrow_exception(thread_exception);
