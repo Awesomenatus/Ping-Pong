@@ -166,7 +166,7 @@ int GameControl(GameObject& game_object,
   while (true) {
     const int frame_duration = 70000;
     const int esc_key = 27;
-    int pressed_key_network;
+    int pressed_key_network = 0;
     if ((!game_object.game_settings.network.isServer) &&
         (game_object.game_settings.network.isNetwork)) {
       noecho();
