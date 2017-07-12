@@ -114,7 +114,7 @@ void DrawField(GameObject& game_object, Score& score) {
 
 void PrepareGame(GameObject& game_object, Score& score, TaskQueue& task_queue,
                 std::unique_ptr<NetworkClass>&& network_class, std::exception_ptr& thread_exception) {
-  int prepare_count = 0, prepare_time = 0, pressed_key, pressed_key_network;
+  int prepare_count = 0, prepare_time = 0, pressed_key, pressed_key_network = 0;
   const int frame_prepare_duration = 100000;
   DrawField(game_object, score);
   while (prepare_time < 3) {
@@ -127,6 +127,9 @@ void PrepareGame(GameObject& game_object, Score& score, TaskQueue& task_queue,
         network_class->Game(game_object, score, pressed_key_network, thread_exception);
         return 0;
       });
+      game_object.platform_controllers.frst->Move(
+          game_object.game_settings, game_object.platform.frst_platform,
+          game_object.ball, pressed_key_network);
     } else {
       pressed_key = ReadUserInput();
       if (!game_object.game_settings.network.isNetwork) {
@@ -183,6 +186,9 @@ int GameControl(GameObject& game_object,
       if (who_finished_round != no_one) {
         return who_finished_round;
       }
+      game_object.platform_controllers.frst->Move(
+          game_object.game_settings, game_object.platform.frst_platform,
+          game_object.ball, pressed_key_network);
       DrawField(game_object, score);
       if (thread_exception)
         return 1;

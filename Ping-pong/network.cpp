@@ -39,9 +39,9 @@ void NetworkServerClass::Game(GameObject& game_object,
                               Score& score,
                               int& pressed_key_network, std::exception_ptr& thread_exception) {
   try {
-  std::lock_guard<std::mutex> lock_t(mutex_thread);
+    mutex_thread.lock();
     pressed_key_network = Read(sock);
-    Send(sock, game_object.platform.frst_platform.getxCoordinate());
+    mutex_thread.unlock();
     Send(sock, game_object.platform.scnd_platform.getxCoordinate());
     Send(sock, game_object.ball.getX());
     Send(sock, game_object.ball.getY());
@@ -63,13 +63,13 @@ void NetworkClientClass::Game(GameObject& game_object,
                               int& pressed_key_network, std::exception_ptr& thread_exception) {
   try {
     Send(sock, pressed_key_network);
-    std::lock_guard<std::mutex> lock_t(mutex_thread);
-    game_object.platform.frst_platform.setxCoordinate(Read(sock));
+    mutex_thread.lock();
     game_object.platform.scnd_platform.setxCoordinate(Read(sock));
     game_object.ball.setX(Read(sock));
     game_object.ball.setY(Read(sock));
     score.frst_score = Read(sock);
     score.scnd_score = Read(sock);
+    mutex_thread.unlock();
   }
   catch (...) {
     thread_exception = std::current_exception();
