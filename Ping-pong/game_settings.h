@@ -35,5 +35,5 @@ int EnterValue(std::string String, int left, int right);
 
 bool SaveSettings(GameSettings game_settings);
 
-GameSettings LoadSettings();
+GameSettings LoadSettings(int& isloaded);
 #endif

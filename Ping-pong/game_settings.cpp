@@ -115,11 +115,14 @@ bool SaveSettings(GameSettings game_settings) {
   fout << "Platform length " << game_settings.platform_length << "\n";
   fout << "AI?             " << game_settings.ai_settings.AICheck << "\n";
   fout << "AI difficulty   " << game_settings.ai_settings.difficulty << "\n";
+  fout << "Is network?     " << game_settings.network.isNetwork << "\n";
+  fout << "Is server?      " << game_settings.network.isServer << "\n";
+  fout << "Server IP       " << game_settings.network.IPServer << "\n";
   fout.close();
   return 1;
 }
 
-GameSettings LoadSettings() {
+GameSettings LoadSettings(int& isloaded) {
   GameSettings game_settings;
   std::string tmp;
   std::ifstream fin("settings", std::ios::in);
@@ -137,12 +140,20 @@ GameSettings LoadSettings() {
     std::getline(fin, tmp);
     game_settings.ai_settings.difficulty =
         std::stoi(tmp.substr(tmp.rfind(" ")));
+    std::getline(fin, tmp);
+    game_settings.network.isNetwork = std::stoi(tmp.substr(tmp.rfind(" ")));;
+    std::getline(fin, tmp);
+    game_settings.network.isServer = std::stoi(tmp.substr(tmp.rfind(" ")));;
+    if (game_settings.network.isNetwork && !game_settings.network.isServer) {
+      std::getline(fin, tmp);
+      game_settings.network.IPServer = std::stoi(tmp.substr(tmp.rfind(" ")));;
+    }
+    isloaded = 1;
     fin.close();
-    game_settings.network.isNetwork = 0;
-    game_settings.network.isServer = 0;
-    game_settings.network.IPServer = " ";
-  } else
-    printw("Unable to open file");
+  } else {
+    isloaded = 0;
+    printw("Unable to open file\n");
+  }
   return game_settings;
 }
 

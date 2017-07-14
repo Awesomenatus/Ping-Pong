@@ -11,8 +11,6 @@
 
 using namespace std;
 
-mutex mutex_main_thread;
-
 int WhoWin(Score& score) {  // rewrite with using enum;
   const int point_limit = 11;
   if ((score.scnd_score >= point_limit) &&
@@ -127,9 +125,10 @@ void PrepareGame(GameObject& game_object, Score& score, TaskQueue& task_queue,
         network_class->Game(game_object, score, pressed_key_network, thread_exception);
         return 0;
       });
-      game_object.platform_controllers.frst->Move(
-          game_object.game_settings, game_object.platform.frst_platform,
-          game_object.ball, pressed_key_network);
+      {
+        std::lock_guard<std::mutex> lock (network_class->mutex_thread);
+        DrawField(game_object, score);
+      }
     } else {
       pressed_key = ReadUserInput();
       if (!game_object.game_settings.network.isNetwork) {
@@ -141,14 +140,17 @@ void PrepareGame(GameObject& game_object, Score& score, TaskQueue& task_queue,
           return 0;
         });
       }
-      game_object.platform_controllers.frst->Move(
-        game_object.game_settings, game_object.platform.frst_platform,
-        game_object.ball, pressed_key_network);
+      {
+        std::lock_guard<std::mutex> lock (network_class->mutex_thread);
+        game_object.platform_controllers.frst->Move(
+          game_object.game_settings, game_object.platform.frst_platform,
+          game_object.ball, pressed_key_network);
+      }
       game_object.platform_controllers.scnd->Move(
         game_object.game_settings, game_object.platform.scnd_platform,
         game_object.ball, pressed_key);
+      DrawField(game_object, score);
     }
-    DrawField(game_object, score);
     printw("\nRound starts in %i...", 3 - prepare_time);
     refresh();
     prepare_count++;
@@ -163,10 +165,10 @@ int GameControl(GameObject& game_object,
                 Score& score,
                 TaskQueue& task_queue,
                 std::unique_ptr<NetworkClass>& network_class, std::exception_ptr& thread_exception) {
+  int pressed_key_network = 0;
   while (true) {
     const int frame_duration = 70000;
     const int esc_key = 27;
-    int pressed_key_network = 0;
     if ((!game_object.game_settings.network.isServer) &&
         (game_object.game_settings.network.isNetwork)) {
       noecho();
@@ -186,10 +188,10 @@ int GameControl(GameObject& game_object,
       if (who_finished_round != no_one) {
         return who_finished_round;
       }
-      game_object.platform_controllers.frst->Move(
-          game_object.game_settings, game_object.platform.frst_platform,
-          game_object.ball, pressed_key_network);
-      DrawField(game_object, score);
+      {
+        std::lock_guard<std::mutex> lock (network_class->mutex_thread);
+        DrawField(game_object, score);
+      }
       if (thread_exception)
         return 1;
     } else {
@@ -217,9 +219,12 @@ int GameControl(GameObject& game_object,
       if (!game_object.game_settings.network.isNetwork) {
         pressed_key_network = pressed_key;
       }
-      game_object.platform_controllers.frst->Move(
-          game_object.game_settings, game_object.platform.frst_platform,
-          game_object.ball, pressed_key_network);
+      {
+        std::lock_guard<std::mutex> lock (network_class->mutex_thread);
+        game_object.platform_controllers.frst->Move(
+            game_object.game_settings, game_object.platform.frst_platform,
+            game_object.ball, pressed_key_network);
+      }
       game_object.ball.move(game_object.platform.frst_platform,
                             game_object.platform.scnd_platform,
                             game_object.game_settings.playing_field_settings);
@@ -247,6 +252,7 @@ void Game(GameSettings& game_settings) {
       printw("wait client connect");
       refresh();
     }
+    mutex mutex_main_thread;
     std::unique_lock<std::mutex> lock(mutex_main_thread);
     connect_check.wait(lock);
   }

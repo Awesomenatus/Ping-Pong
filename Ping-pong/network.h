@@ -13,6 +13,7 @@
 class NetworkClass {
  public:
   std::mutex mutex_thread;
+  boost::asio::io_service service;
   virtual void Connect(GameSettings& game_settings,
                        std::condition_variable& connect_check, std::exception_ptr& thread_exception) = 0;
   virtual void Game(GameObject& game_object,
