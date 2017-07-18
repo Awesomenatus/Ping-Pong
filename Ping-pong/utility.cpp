@@ -26,7 +26,10 @@ int WhoWin(Score& score) {  // rewrite with using enum;
 int ScoreCount(GameObject& game_object, Score& score) {
   if (game_object.ball.getY() == 1) {
     printw("\nThe player on the right won round.");
-    score.scnd_score++;
+    if (!game_object.game_settings.network.isNetwork ||
+        game_object.game_settings.network.isServer) {
+      score.scnd_score++;
+    }
     if (WhoWin(score) == 2) {
       printw("\nThe player on the right won game.");
       return 2;
@@ -34,7 +37,10 @@ int ScoreCount(GameObject& game_object, Score& score) {
     return 3;
   } else if (game_object.ball.getY() == game_object.playing_field.getY() - 2) {
     printw("\nThe player on the left won round.");
-    score.frst_score++;
+    if (!game_object.game_settings.network.isNetwork ||
+        game_object.game_settings.network.isServer) {
+      score.frst_score++;
+    }
     if (WhoWin(score) == 1) {
       printw("\nThe player on the left won game.");
       return 1;
@@ -110,9 +116,13 @@ void DrawField(GameObject& game_object, Score& score) {
   refresh();
 }
 
-void PrepareGame(GameObject& game_object, Score& score, TaskQueue& task_queue,
-                std::unique_ptr<NetworkClass>& network_class, std::exception_ptr& thread_exception) {
-  int prepare_count = 0, prepare_time = 0, pressed_key, pressed_key_network = 0;
+void PrepareGame(GameObject& game_object,
+                 Score& score,
+                 TaskQueue& task_queue,
+                 int& pressed_key_network,
+                 std::unique_ptr<NetworkClass>& network_class,
+                 std::exception_ptr& thread_exception) {
+  int prepare_count = 0, prepare_time = 0, pressed_key = 0;
   const int frame_prepare_duration = 100000;
   DrawField(game_object, score);
   while (prepare_time < 3) {
@@ -122,11 +132,12 @@ void PrepareGame(GameObject& game_object, Score& score, TaskQueue& task_queue,
         (game_object.game_settings.network.isNetwork)) {
       pressed_key_network = ReadUserInput();
       task_queue.AddTask([&]() {
-        network_class->Game(game_object, score, pressed_key_network, thread_exception);
+        network_class->Game(game_object, score, pressed_key_network,
+                            thread_exception);
         return 0;
       });
       {
-        std::lock_guard<std::mutex> lock (network_class->mutex_thread);
+        std::lock_guard<std::mutex> lock(network_class->mutex_thread);
         DrawField(game_object, score);
       }
     } else {
@@ -136,19 +147,20 @@ void PrepareGame(GameObject& game_object, Score& score, TaskQueue& task_queue,
       }
       if (game_object.game_settings.network.isNetwork) {
         task_queue.AddTask([&]() {
-          network_class->Game(game_object, score, pressed_key_network, thread_exception);
+          network_class->Game(game_object, score, pressed_key_network,
+                              thread_exception);
           return 0;
         });
       }
       {
-        std::lock_guard<std::mutex> lock (network_class->mutex_thread);
+        std::lock_guard<std::mutex> lock(network_class->mutex_thread);
         game_object.platform_controllers.frst->Move(
-          game_object.game_settings, game_object.platform.frst_platform,
-          game_object.ball, pressed_key_network);
+            game_object.game_settings, game_object.platform.frst_platform,
+            game_object.ball, pressed_key_network);
+        game_object.platform_controllers.scnd->Move(
+            game_object.game_settings, game_object.platform.scnd_platform,
+            game_object.ball, pressed_key);
       }
-      game_object.platform_controllers.scnd->Move(
-        game_object.game_settings, game_object.platform.scnd_platform,
-        game_object.ball, pressed_key);
       DrawField(game_object, score);
     }
     printw("\nRound starts in %i...", 3 - prepare_time);
@@ -164,8 +176,9 @@ void PrepareGame(GameObject& game_object, Score& score, TaskQueue& task_queue,
 int GameControl(GameObject& game_object,
                 Score& score,
                 TaskQueue& task_queue,
-                std::unique_ptr<NetworkClass>& network_class, std::exception_ptr& thread_exception) {
-  int pressed_key_network = 0;
+                int& pressed_key_network,
+                std::unique_ptr<NetworkClass>& network_class,
+                std::exception_ptr& thread_exception) {
   while (true) {
     const int frame_duration = 70000;
     const int esc_key = 27;
@@ -179,7 +192,8 @@ int GameControl(GameObject& game_object,
         return 0;
       }
       task_queue.AddTask([&]() {
-        network_class->Game(game_object, score, pressed_key_network, thread_exception);
+        network_class->Game(game_object, score, pressed_key_network,
+                            thread_exception);
         return 0;
       });
       const int who_finished_round = ScoreCount(game_object, score);
@@ -189,7 +203,7 @@ int GameControl(GameObject& game_object,
         return who_finished_round;
       }
       {
-        std::lock_guard<std::mutex> lock (network_class->mutex_thread);
+        std::lock_guard<std::mutex> lock(network_class->mutex_thread);
         DrawField(game_object, score);
       }
       if (thread_exception)
@@ -204,30 +218,32 @@ int GameControl(GameObject& game_object,
       }
       if (game_object.game_settings.network.isNetwork)
         task_queue.AddTask([&]() {
-          network_class->Game(game_object, score, pressed_key_network, thread_exception);
+          network_class->Game(game_object, score, pressed_key_network,
+                              thread_exception);
           return 0;
         });
-      const int who_finished_round = ScoreCount(game_object, score);
-      const int no_one = 0;
-      refresh();
-      if (who_finished_round != no_one) {
-        return who_finished_round;
-      }
-      game_object.platform_controllers.scnd->Move(
-          game_object.game_settings, game_object.platform.scnd_platform,
-          game_object.ball, pressed_key);
+
       if (!game_object.game_settings.network.isNetwork) {
         pressed_key_network = pressed_key;
       }
       {
-        std::lock_guard<std::mutex> lock (network_class->mutex_thread);
+        std::lock_guard<std::mutex> lock(network_class->mutex_thread);
+        const int who_finished_round = ScoreCount(game_object, score);
+        const int no_one = 0;
+        refresh();
+        if (who_finished_round != no_one) {
+          return who_finished_round;
+        }
+        game_object.platform_controllers.scnd->Move(
+            game_object.game_settings, game_object.platform.scnd_platform,
+            game_object.ball, pressed_key);
         game_object.platform_controllers.frst->Move(
             game_object.game_settings, game_object.platform.frst_platform,
             game_object.ball, pressed_key_network);
+        game_object.ball.move(game_object.platform.frst_platform,
+                              game_object.platform.scnd_platform,
+                              game_object.game_settings.playing_field_settings);
       }
-      game_object.ball.move(game_object.platform.frst_platform,
-                            game_object.platform.scnd_platform,
-                            game_object.game_settings.playing_field_settings);
       DrawField(game_object, score);
       if (thread_exception)
         return 1;
@@ -259,25 +275,26 @@ void Game(GameSettings& game_settings) {
   Score score;
   score.frst_score = 0;
   score.scnd_score = 0;
+  int pressed_key_network = 0;
   if (thread_exception) {
     try {
       std::rethrow_exception(thread_exception);
-    }
-    catch (const std::exception &ex) {
-        printw("Wrong IP adress");
-        refresh();
+    } catch (const std::exception& ex) {
+      printw("Wrong IP adress");
+      refresh();
     }
   } else {
-      while ((round_result != 1) && (round_result != 2)) {
+    while ((round_result != 1) && (round_result != 2)) {
       GameObject game_object(game_settings);
-      PrepareGame(game_object, score, task_queue, network_class, thread_exception);
-        round_result =
-      GameControl(game_object, score, task_queue, network_class, thread_exception);
+      PrepareGame(game_object, score, task_queue, pressed_key_network,
+                  network_class, thread_exception);
+      round_result =
+          GameControl(game_object, score, task_queue, pressed_key_network,
+                      network_class, thread_exception);
       if (thread_exception) {
         try {
           std::rethrow_exception(thread_exception);
-        }
-        catch (...) {
+        } catch (...) {
           if (game_object.game_settings.network.isServer) {
             printw("Client disconnect from the game");
           } else {
@@ -287,8 +304,8 @@ void Game(GameSettings& game_settings) {
           break;
         }
       } else {
-      if (round_result == 0)
-        break;
+        if (round_result == 0)
+          break;
       }
     };
   }

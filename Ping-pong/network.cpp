@@ -11,14 +11,14 @@ io_service service;
 NetworkClass::~NetworkClass() {}
 
 void NetworkClass::Send(ip::tcp::socket& sock, int info) {
-  char tmp[4];
+  char tmp[4] = {0};
   snprintf(tmp, 4, "%i", info);
-  sock.write_some(buffer(tmp));
+  write(sock, buffer(tmp, 3));
 }
 
 int NetworkClass::Read(ip::tcp::socket& sock) {
-  char tmp[4];
-  sock.read_some(buffer(tmp));
+  char tmp[4] = {0};
+  read(sock, buffer(tmp, 3));
   return atoi(tmp);
 }
 
@@ -27,7 +27,8 @@ NetworkServerClass::NetworkServerClass()
       acceptor(service, ip::tcp::endpoint(ip::tcp::v4(), 8001)) {}
 
 void NetworkServerClass::Connect(GameSettings& game_settings,
-                                 std::condition_variable& connect_check, std::exception_ptr& thread_exception) {
+                                 std::condition_variable& connect_check,
+                                 std::exception_ptr& thread_exception) {
   acceptor.accept(sock);
   Send(sock, game_settings.playing_field_settings.x_playing_field);
   Send(sock, game_settings.playing_field_settings.y_playing_field);
@@ -37,20 +38,20 @@ void NetworkServerClass::Connect(GameSettings& game_settings,
 
 void NetworkServerClass::Game(GameObject& game_object,
                               Score& score,
-                              int& pressed_key_network, std::exception_ptr& thread_exception) {
+                              int& pressed_key_network,
+                              std::exception_ptr& thread_exception) {
   try {
     {
-      std::lock_guard<std::mutex> lock (mutex_thread);
+      std::lock_guard<std::mutex> lock(mutex_thread);
       pressed_key_network = Read(sock);
+      Send(sock, game_object.platform.frst_platform.getxCoordinate());
+      Send(sock, game_object.platform.scnd_platform.getxCoordinate());
+      Send(sock, game_object.ball.getX());
+      Send(sock, game_object.ball.getY());
+      Send(sock, score.frst_score);
+      Send(sock, score.scnd_score);
     }
-    Send(sock, game_object.platform.frst_platform.getxCoordinate());
-    Send(sock, game_object.platform.scnd_platform.getxCoordinate());
-    Send(sock, game_object.ball.getX());
-    Send(sock, game_object.ball.getY());
-    Send(sock, score.frst_score);
-    Send(sock, score.scnd_score);
-  }
-  catch (...) {
+  } catch (...) {
     thread_exception = std::current_exception();
     return;
   }
@@ -62,11 +63,12 @@ NetworkClientClass::NetworkClientClass() : sock(service) {}
 
 void NetworkClientClass::Game(GameObject& game_object,
                               Score& score,
-                              int& pressed_key_network, std::exception_ptr& thread_exception) {
+                              int& pressed_key_network,
+                              std::exception_ptr& thread_exception) {
   try {
     Send(sock, pressed_key_network);
     {
-      std::lock_guard<std::mutex> lock (mutex_thread);
+      std::lock_guard<std::mutex> lock(mutex_thread);
       game_object.platform.frst_platform.setxCoordinate(Read(sock));
       game_object.platform.scnd_platform.setxCoordinate(Read(sock));
       game_object.ball.setX(Read(sock));
@@ -74,27 +76,26 @@ void NetworkClientClass::Game(GameObject& game_object,
       score.frst_score = Read(sock);
       score.scnd_score = Read(sock);
     }
-  }
-  catch (...) {
+  } catch (...) {
     thread_exception = std::current_exception();
     return;
   }
 }
 
 void NetworkClientClass::Connect(GameSettings& game_settings,
-                                 std::condition_variable& connect_check, std::exception_ptr& thread_exception) {
+                                 std::condition_variable& connect_check,
+                                 std::exception_ptr& thread_exception) {
   try {
-    ip::tcp::endpoint ep(ip::address::from_string(game_settings.network.IPServer),
-                       8001); 
+    ip::tcp::endpoint ep(
+        ip::address::from_string(game_settings.network.IPServer), 8001);
     sock.connect(ep);
-  }
-  catch (...) {
+  } catch (...) {
     connect_check.notify_one();
     thread_exception = std::current_exception();
     return;
   }
   {
-    std::lock_guard<std::mutex> lock (mutex_thread);
+    std::lock_guard<std::mutex> lock(mutex_thread);
     game_settings.playing_field_settings.x_playing_field = Read(sock);
     game_settings.playing_field_settings.y_playing_field = Read(sock);
     game_settings.platform_length = Read(sock);

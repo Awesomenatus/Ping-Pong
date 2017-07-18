@@ -15,10 +15,12 @@ class NetworkClass {
   std::mutex mutex_thread;
   boost::asio::io_service service;
   virtual void Connect(GameSettings& game_settings,
-                       std::condition_variable& connect_check, std::exception_ptr& thread_exception) = 0;
+                       std::condition_variable& connect_check,
+                       std::exception_ptr& thread_exception) = 0;
   virtual void Game(GameObject& game_object,
                     Score& score,
-                    int& pressed_button, std::exception_ptr& thread_exception) = 0;
+                    int& pressed_button,
+                    std::exception_ptr& thread_exception) = 0;
   void Send(boost::asio::ip::tcp::socket& sock, int info);
   int Read(boost::asio::ip::tcp::socket& sock);
   virtual ~NetworkClass();
@@ -30,8 +32,12 @@ class NetworkServerClass : public NetworkClass {
   boost::asio::ip::tcp::acceptor acceptor;
   NetworkServerClass();
   void Connect(GameSettings& game_settings,
-               std::condition_variable& connect_check, std::exception_ptr& thread_exception);
-  void Game(GameObject& game_object, Score& score, int& pressed_button, std::exception_ptr& thread_exception);
+               std::condition_variable& connect_check,
+               std::exception_ptr& thread_exception);
+  void Game(GameObject& game_object,
+            Score& score,
+            int& pressed_button,
+            std::exception_ptr& thread_exception);
   virtual ~NetworkServerClass();
 };
 
@@ -40,8 +46,12 @@ class NetworkClientClass : public NetworkClass {
   boost::asio::ip::tcp::socket sock;
   NetworkClientClass();
   void Connect(GameSettings& game_settings,
-               std::condition_variable& connect_check, std::exception_ptr& thread_exception);
-  void Game(GameObject& game_object, Score& score, int& pressed_button, std::exception_ptr& thread_exception);
+               std::condition_variable& connect_check,
+               std::exception_ptr& thread_exception);
+  void Game(GameObject& game_object,
+            Score& score,
+            int& pressed_button,
+            std::exception_ptr& thread_exception);
   virtual ~NetworkClientClass();
 };
 

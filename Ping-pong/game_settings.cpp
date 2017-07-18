@@ -117,7 +117,7 @@ bool SaveSettings(GameSettings game_settings) {
   fout << "AI difficulty   " << game_settings.ai_settings.difficulty << "\n";
   fout << "Is network?     " << game_settings.network.isNetwork << "\n";
   fout << "Is server?      " << game_settings.network.isServer << "\n";
-  fout << "Server IP       " << game_settings.network.IPServer << "\n";
+  fout << "Server IP       " << game_settings.network.IPServer.c_str() << "\n";
   fout.close();
   return 1;
 }
@@ -141,12 +141,14 @@ GameSettings LoadSettings(int& isloaded) {
     game_settings.ai_settings.difficulty =
         std::stoi(tmp.substr(tmp.rfind(" ")));
     std::getline(fin, tmp);
-    game_settings.network.isNetwork = std::stoi(tmp.substr(tmp.rfind(" ")));;
+    game_settings.network.isNetwork = std::stoi(tmp.substr(tmp.rfind(" ")));
+    ;
     std::getline(fin, tmp);
-    game_settings.network.isServer = std::stoi(tmp.substr(tmp.rfind(" ")));;
+    game_settings.network.isServer = std::stoi(tmp.substr(tmp.rfind(" ")));
+    ;
     if (game_settings.network.isNetwork && !game_settings.network.isServer) {
       std::getline(fin, tmp);
-      game_settings.network.IPServer = std::stoi(tmp.substr(tmp.rfind(" ")));;
+      game_settings.network.IPServer = tmp.substr(tmp.rfind(" "));
     }
     isloaded = 1;
     fin.close();
