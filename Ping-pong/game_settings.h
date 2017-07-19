@@ -2,7 +2,6 @@
 #define H_GAMESETTINGS
 
 #include <string>
-#include <mutex>
 
 struct NetworkSettings {
   bool isNetwork;
@@ -33,7 +32,7 @@ GameSettings getGameSettings();
 
 int EnterValue(std::string String, int left, int right);
 
-bool SaveSettings(GameSettings game_settings);
+bool SaveSettings(GameSettings& game_settings);
 
 GameSettings LoadSettings(int& isloaded);
 #endif

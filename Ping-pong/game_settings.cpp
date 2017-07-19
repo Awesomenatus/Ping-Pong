@@ -102,7 +102,7 @@ GameSettings getGameSettings() {
   return game_settings;
 }
 
-bool SaveSettings(GameSettings game_settings) {
+bool SaveSettings(GameSettings& game_settings) {
   std::ofstream fout("settings", std::ios_base::out | std::ios_base::trunc);
   if (!fout.is_open()) {
     printw("File can't be open or create\n");
@@ -142,13 +142,11 @@ GameSettings LoadSettings(int& isloaded) {
         std::stoi(tmp.substr(tmp.rfind(" ")));
     std::getline(fin, tmp);
     game_settings.network.isNetwork = std::stoi(tmp.substr(tmp.rfind(" ")));
-    ;
     std::getline(fin, tmp);
     game_settings.network.isServer = std::stoi(tmp.substr(tmp.rfind(" ")));
-    ;
     if (game_settings.network.isNetwork && !game_settings.network.isServer) {
       std::getline(fin, tmp);
-      game_settings.network.IPServer = tmp.substr(tmp.rfind(" "));
+      game_settings.network.IPServer = tmp.substr(tmp.rfind(" ") + 1);
     }
     isloaded = 1;
     fin.close();
@@ -167,5 +165,5 @@ GameSettings::GameSettings() {
   ai_settings.AICheck = 0;
   network.isNetwork = 0;
   network.isServer = 0;
-  network.IPServer = "";
+  network.IPServer = " ";
 }
