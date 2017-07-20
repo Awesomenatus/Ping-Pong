@@ -3,10 +3,6 @@
 #include <unistd.h>
 
 GameObject::GameObject(GameSettings& game_settings) {
-  /*if ((game_settings.network.isServer == 0) &&
-  (game_settings.network.isNetwork == 1)) {
-    this->playing_field = PlayingField(game_settings.playing_field_settings);
-  } else {*/
   this->playing_field = PlayingField(game_settings.playing_field_settings);
   this->ball = Ball(game_settings.playing_field_settings.x_playing_field / 2,
                     game_settings.playing_field_settings.y_playing_field / 2);
@@ -28,5 +24,4 @@ GameObject::GameObject(GameSettings& game_settings) {
       PlatformControllerFactory::newPlatformController(
           0, KEY_UP, KEY_DOWN, game_settings.ai_settings.difficulty);
   this->game_settings = game_settings;
-  //}
 }

@@ -12,7 +12,7 @@ int main() {
   cbreak();
   GameSettings game_settings;
   char new_game, new_game_new_value = 'y';
-  printw("Do you want to load the settings?\n");
+  printw("Do you want to load the settings? (y/n)\n");
 
   char load;
   scanw("%c", &load);
@@ -39,8 +39,6 @@ int main() {
     }
     refresh();
     Game(game_settings);
-    sleep(2);
-    echo();
     clear();
     printw("Try again?\n");
     scanw("%c", &new_game);

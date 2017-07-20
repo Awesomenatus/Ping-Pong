@@ -66,7 +66,7 @@ GameSettings getGameSettings() {
     } else {
       printw("Enter server's IP\n");
       auto& IPServer = game_settings.network.IPServer;
-      IPServer.reserve(16);
+      IPServer.resize(16);
       scanw("%16s", IPServer.data());
 
       game_settings.network.isServer = 0;
@@ -102,7 +102,7 @@ GameSettings getGameSettings() {
   return game_settings;
 }
 
-bool SaveSettings(GameSettings& game_settings) {
+bool SaveSettings(GameSettings game_settings) {
   std::ofstream fout("settings", std::ios_base::out | std::ios_base::trunc);
   if (!fout.is_open()) {
     printw("File can't be open or create\n");

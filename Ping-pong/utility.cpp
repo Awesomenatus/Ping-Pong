@@ -11,7 +11,16 @@
 
 using namespace std;
 
-int WhoWin(Score& score) {  // rewrite with using enum;
+void PlatformControll(GameObject& game_object, int pressed_key, int pressed_key_network) {
+  game_object.platform_controllers.frst->Move(
+      game_object.game_settings, game_object.platform.frst_platform,
+      game_object.ball, pressed_key_network);
+  game_object.platform_controllers.scnd->Move(
+      game_object.game_settings, game_object.platform.scnd_platform,
+      game_object.ball, pressed_key);
+}
+
+int WhoWin(Score& score) {
   const int point_limit = 11;
   if ((score.scnd_score >= point_limit) &&
       (score.scnd_score > (score.frst_score + 1))) {
@@ -25,7 +34,6 @@ int WhoWin(Score& score) {  // rewrite with using enum;
 
 int ScoreCount(GameObject& game_object, Score& score) {
   if (game_object.ball.getY() == 1) {
-    printw("\nThe player on the right won round.");
     if (!game_object.game_settings.network.isNetwork ||
         game_object.game_settings.network.isServer) {
       score.scnd_score++;
@@ -36,7 +44,6 @@ int ScoreCount(GameObject& game_object, Score& score) {
     }
     return 3;
   } else if (game_object.ball.getY() == game_object.playing_field.getY() - 2) {
-    printw("\nThe player on the left won round.");
     if (!game_object.game_settings.network.isNetwork ||
         game_object.game_settings.network.isServer) {
       score.frst_score++;
@@ -127,7 +134,6 @@ void PrepareGame(GameObject& game_object,
   DrawField(game_object, score);
   while (prepare_time < 3) {
     usleep(frame_prepare_duration);
-    cbreak();
     if ((!game_object.game_settings.network.isServer) &&
         (game_object.game_settings.network.isNetwork)) {
       pressed_key_network = ReadUserInput();
@@ -154,12 +160,7 @@ void PrepareGame(GameObject& game_object,
       }
       {
         std::lock_guard<std::mutex> lock(network_class->mutex_thread);
-        game_object.platform_controllers.frst->Move(
-            game_object.game_settings, game_object.platform.frst_platform,
-            game_object.ball, pressed_key_network);
-        game_object.platform_controllers.scnd->Move(
-            game_object.game_settings, game_object.platform.scnd_platform,
-            game_object.ball, pressed_key);
+        PlatformControll(game_object, pressed_key, pressed_key_network);
       }
       DrawField(game_object, score);
     }
@@ -184,9 +185,7 @@ int GameControl(GameObject& game_object,
     const int esc_key = 27;
     if ((!game_object.game_settings.network.isServer) &&
         (game_object.game_settings.network.isNetwork)) {
-      noecho();
       usleep(frame_duration);
-      cbreak();
       pressed_key_network = ReadUserInput();
       if (pressed_key_network == esc_key) {
         return 0;
@@ -196,22 +195,20 @@ int GameControl(GameObject& game_object,
                             thread_exception);
         return 0;
       });
-      const int who_finished_round = ScoreCount(game_object, score);
-      const int no_one = 0;
-      refresh();
-      if (who_finished_round != no_one) {
-        return who_finished_round;
-      }
       {
         std::lock_guard<std::mutex> lock(network_class->mutex_thread);
+        const int who_finished_round = ScoreCount(game_object, score);
+        const int no_one = 0;
+        refresh();
+        if (who_finished_round != no_one) {
+          return who_finished_round;
+        }
         DrawField(game_object, score);
       }
       if (thread_exception)
         return 1;
     } else {
-      noecho();
       usleep(frame_duration);
-      cbreak();
       int pressed_key = ReadUserInput();
       if (pressed_key == esc_key) {
         return 0;
@@ -234,12 +231,7 @@ int GameControl(GameObject& game_object,
         if (who_finished_round != no_one) {
           return who_finished_round;
         }
-        game_object.platform_controllers.scnd->Move(
-            game_object.game_settings, game_object.platform.scnd_platform,
-            game_object.ball, pressed_key);
-        game_object.platform_controllers.frst->Move(
-            game_object.game_settings, game_object.platform.frst_platform,
-            game_object.ball, pressed_key_network);
+        PlatformControll(game_object, pressed_key, pressed_key_network);
         game_object.ball.move(game_object.platform.frst_platform,
                               game_object.platform.scnd_platform,
                               game_object.game_settings.playing_field_settings);
@@ -311,4 +303,5 @@ void Game(GameSettings& game_settings) {
   }
   task_queue.AddTask([]() { return 1; });
   network.join();
+  sleep(2);
 }

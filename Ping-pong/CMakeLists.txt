@@ -12,6 +12,14 @@ include_directories(${GTEST_INCLUDE_DIRS})
 
 find_package(Boost 1.58.0 REQUIRED system)
 
+if(NOT Boost_FOUND)
+
+  message(SEND_ERROR "Failed to find boost")
+	
+  return()
+	
+endif()
+
 find_package(Curses REQUIRED)
 
 if(NOT Curses_FOUND)
