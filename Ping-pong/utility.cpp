@@ -158,7 +158,7 @@ void PrepareGame(GameObject& game_object,
           return 0;
         });
       }
-      {
+      if (game_object.game_settings.network.isNetwork) {
         std::lock_guard<std::mutex> lock(network_class->mutex_thread);
         PlatformControll(game_object, pressed_key, pressed_key_network);
       }
@@ -224,7 +224,8 @@ int GameControl(GameObject& game_object,
         pressed_key_network = pressed_key;
       }
       {
-        std::lock_guard<std::mutex> lock(network_class->mutex_thread);
+        if (game_object.game_settings.network.isNetwork) 
+          std::lock_guard<std::mutex> lock(network_class->mutex_thread);
         const int who_finished_round = ScoreCount(game_object, score);
         const int no_one = 0;
         refresh();
